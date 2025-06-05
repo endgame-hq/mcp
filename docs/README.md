@@ -23,7 +23,7 @@ Endgame uses a powerful MCP to integrate directly into AI-augmented development 
 
 ## Key Features
 
-### Model Context Protocol (MCP) Core
+### Model Context Protocol (MCP)
 
 At the foundation of Endgame is a powerful implementation of the [Model Context Protocol](https://modelcontextprotocol.io/introduction). It continuously evaluates code, manages deployments, runs tests, and handles debugging—acting as an operational partner for your AI Agent.
 
@@ -47,7 +47,7 @@ Whether front-end, back-end, or both—if it runs a standard Node.js web server,
 
 Every deployment includes an automated code review step. Endgame collaborates with your AI Agent to catch issues early and improve outcomes.
 
-#### Automated Testing & Debugging
+### Automated Testing & Debugging
 
 Each deployment is tested automatically. Failures are returned with structured diagnostics—logs, errors, stack traces, and insights—so the AI Agent can immediately analyze and improve the next iteration.
 
@@ -60,9 +60,11 @@ Endgame is optimized for fast, autonomous deployment across a range of modern we
 * **Webhooks** for services like Stripe, Zapier, and other third-party APIs.
 * **Integrations** and utility services that require rapid deployment and iteration.
 
-**To get started, pick the tool you wish to set up Endgame with:**
+## Get Started
+
+To get started, check out our [getting started](setup/) guide, or navigate to the specific tool you use.
 
 * [Cursor](guides/cursor/)
-* [Claude Code]()
+* [Claude Code](guides/claude-code)
 * [VSCode](guides/vscode/)
 * [Windsurf](guides/windsurf/)

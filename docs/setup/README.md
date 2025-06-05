@@ -2,15 +2,13 @@
 layout: doc-layout.njk
 title: "Endgame - Documentation - Getting Started"
 titleMenu: "Getting Started"
-description: "How to set up Endgame with various IDEs including VS Code, Cursor, and Windsurf. Learn workflows and best practices for AI-powered development."
+description: "How to set up Endgame with various IDEs including Cursor, Claude Code, Windsurf, and VS Code."
 keywords: "endgame guides, ide integration, vscode, cursor, windsurf, ai development, workflow guides"
 active: "docs"
 permalink: "/docs/setup/"
 docPath: "/setup/"
 order: 1
 ---
-
-# Setup
 
 Endgame prioritizes its [Model Context Protocol Server (MCP)](https://modelcontextprotocol.io/introduction) for a streamlined experience, over traditional cloud tools like CLIs, SDKs, or dashboards.
 
