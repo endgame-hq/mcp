@@ -29,11 +29,26 @@ To obtain an API Key:
 
 **Security Note:** Your API Key is linked to your personal account. Treat it like a password—do not share or expose it publicly. It enables your AI tools to act on your behalf, automating tasks within your Endgame account.
 
+This section contains detailed guides for using our platform.
+
 ## Tool Setup
 
-We've published guides on getting started with specific tools Choose a guide from the list below to get started:
+First, check that you have **Node.js 22.x** or later in your environment to install and use the Endgame MCP.
+
+Next, we've published guides on getting started with specific tools Choose a guide from the list below to get started:
 
 - [Cursor Guide](./cursor.md) - Set up and use our platform with Cursor AI IDE
 - [Claude Code](./claude-code.md) - Set up and use our platform with Claude Code
 - [VS Code Guide](./vscode.md) - Set up and use our platform with Visual Studio Code
 - [Windsurf Guide](./windsurf.md) - Set up and use our platform with Windsurf IDE
+
+
+## Application Setup
+
+You can use Endgame to deploy new or existing codebases, even codebases that are already being deployed with other tools. Endgame is not invasive and you can use both side-by-side.
+
+Endgame expects a traditional back-end server architecture (e.g., an Express.js back-end). Currently, Endgame only supports applications that use Node.js version 22. The cloud runtime is Node.js 22 only at ths time.
+
+After the MCP is installed, navigate to the working directory of your application's root folder, and ask the AI in your preferred tool to deploy it using Endgame.
+
+The Endgame MCP will handle the deployment process automatically. To learn more about what happens next and how to best work with Endgame, check out the [Workflow](guides/workflow) guide.
