@@ -10,21 +10,38 @@ docPath: "/guides/windsurf"
 order: 4
 ---
 
-# Windsurf Guide
+Windsurf is an AI-native IDE that radically reimagines how developers build software. It supports MCP servers, and by adding Endgame, you'll enable Windsurf to seamlessly deploy any code that it writes.
 
-## Windsurf Setup
+## Install Windsurf
 
-Learn how to set up and use our platform with Windsurf IDE.
+If you don't already have Windsurf installed, download it from the [official Windsurf website](https://codeium.com/windsurf) and follow their installation guide.
 
-### Installation
+## Add Endgame MCP Server
 
-Follow these steps to install the Windsurf extension:
+To add the Endgame MCP server to Windsurf, you'll need to create or edit the MCP configuration file:
 
-1. Open Windsurf
-2. Install our MCP server
-3. Configure your workspace
-4. Start building with AI
+1. Navigate to your home directory
+2. Open or create the file `~/.codeium/windsurf/mcp_config.json`
+3. Add the following configuration:
 
-### Workflow
+```json
+{
+  "mcpServers": {
+    "endgame": {
+      "command": "npx",
+      "args": ["endgame-mcp@latest"],
+      "env": {
+        "API_KEY": "your_endgame_api_key"
+      }
+    }
+  }
+}
+```
 
-Optimize your development workflow with Windsurf and our platform. 
+Replace `your_endgame_api_key` with your actual Endgame API key, which you can obtain from Endgame's [dashboard](https://dashboard.endgame.dev).
+
+## Verify Installation
+
+To confirm the MCP server has been correctly installed, restart Windsurf and check that the Endgame tools are available in your AI conversations.
+
+Once configured, you can use the Endgame tools directly within Windsurf conversations to manage your applications and deployments seamlessly. 
