@@ -7,7 +7,7 @@ keywords: "endgame workflow, development workflow, deployment, branches, preview
 active: "docs"
 permalink: "/docs/guides/workflow/"
 docPath: "/guides/workflow"
-order: 1
+order: 2
 ---
 
 # Endgame MCP Development Workflow

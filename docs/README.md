@@ -21,29 +21,29 @@ Endgame uses a powerful MCP to integrate directly into AI-augmented development 
 * [VSCode](guides/vscode/)
 * [Windsurf](guides/windsurf/)
 
-### Key Features
+## Key Features
 
-#### Model Context Protocol (MCP) Core
+### Model Context Protocol (MCP) Core
 
 At the foundation of Endgame is a powerful implementation of the [Model Context Protocol](https://modelcontextprotocol.io/introduction). It continuously evaluates code, manages deployments, runs tests, and handles debugging—acting as an operational partner for your AI Agent.
 
-#### Rapid Deployments
+### Rapid Deployments
 
 Deployments average around 10 seconds, empowering AI Agents to ship and test new versions without delay.
 
-#### Cloud Builds
+### Cloud Builds
 
 All code is uploaded and built directly in the cloud. This eliminates the need for local environments and the complexity that surrounds that, allowing AI Agents to work in clean, reproducible conditions from anywhere, which mirrors the production environment.
 
-#### Infinite Branching
+### Infinite Branching
 
 Endgame supports deploying an unlimited number of branches simultaneously, enabling isolated experiments and liberating background Agents to work on parts of an app without disrupting the main development flow.
 
-#### Full-Stack Deployment
+### Full-Stack Deployment
 
 Whether front-end, back-end, or both—if it runs a standard Node.js web server, Endgame can deploy it. The platform is optimized for full-stack autonomy.
 
-#### Autonomous Code Review
+### Autonomous Code Review
 
 Every deployment includes an automated code review step. Endgame collaborates with your AI Agent to catch issues early and improve outcomes.
 
@@ -51,7 +51,7 @@ Every deployment includes an automated code review step. Endgame collaborates wi
 
 Each deployment is tested automatically. Failures are returned with structured diagnostics—logs, errors, stack traces, and insights—so the AI Agent can immediately analyze and improve the next iteration.
 
-### Use Cases
+## Use Cases
 
 Endgame is optimized for fast, autonomous deployment across a range of modern web workloads. Typical use cases include:
 

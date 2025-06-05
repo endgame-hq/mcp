@@ -7,7 +7,7 @@ keywords: "endgame vscode, visual studio code, vscode extension, ai coding, mcp 
 active: "docs"
 permalink: "/docs/guides/vscode/"
 docPath: "/guides/vscode"
-order: 3
+order: 5
 ---
 
 # VS Code Guide

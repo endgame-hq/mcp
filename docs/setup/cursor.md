@@ -7,7 +7,7 @@ keywords: "endgame cursor, cursor ai ide, cursor integration, ai coding, mcp ser
 active: "docs"
 permalink: "/docs/guides/cursor/"
 docPath: "/guides/cursor"
-order: 4
+order: 2
 ---
 
 # Cursor Guide

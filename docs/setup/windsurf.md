@@ -7,7 +7,7 @@ keywords: "endgame windsurf, windsurf ide, windsurf integration, ai coding, mcp 
 active: "docs"
 permalink: "/docs/guides/windsurf/"
 docPath: "/guides/windsurf"
-order: 5
+order: 4
 ---
 
 # Windsurf Guide

@@ -1,12 +1,12 @@
 ---
 layout: doc-layout.njk
-title: "Endgame - Documentation - Setup"
-titleMenu: "Setup"
+title: "Endgame - Documentation - Getting Started"
+titleMenu: "Getting Started"
 description: "How to set up Endgame with various IDEs including VS Code, Cursor, and Windsurf. Learn workflows and best practices for AI-powered development."
 keywords: "endgame guides, ide integration, vscode, cursor, windsurf, ai development, workflow guides"
 active: "docs"
-permalink: "/docs/guides/"
-docPath: "/guides/"
+permalink: "/docs/setup/"
+docPath: "/setup/"
 order: 1
 ---
 
