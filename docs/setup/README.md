@@ -29,8 +29,6 @@ To obtain an API Key:
 
 **Security Note:** Your API Key is linked to your personal account. Treat it like a password—do not share or expose it publicly. It enables your AI tools to act on your behalf, automating tasks within your Endgame account.
 
-This section contains detailed guides for using our platform.
-
 ## Tool Setup
 
 We've published guides on getting started with specific tools Choose a guide from the list below to get started:

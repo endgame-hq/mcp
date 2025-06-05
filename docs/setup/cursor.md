@@ -10,21 +10,40 @@ docPath: "/guides/cursor"
 order: 2
 ---
 
-# Cursor Guide
+Cursor is a world-class AI-powered code editor built for programming with AI. It supports MCP servers, and by adding Endgame, you'll enable Cursor to seamlessly deploy any code that it writes.
 
-## Cursor Setup
+## Install Cursor
 
-Learn how to set up and use our platform with Cursor AI IDE.
+If you don't already have Cursor installed, download it from the [official Cursor website](https://cursor.sh/) and follow their installation guide.
 
-### Installation
+## Add Endgame MCP Server
 
-Follow these steps to install the Cursor extension:
+To add the Endgame MCP server to Cursor, follow these steps:
 
 1. Open Cursor
-2. Install our MCP server
-3. Configure your settings
-4. Start coding with AI assistance
+2. Go to **Cursor Settings** 
+3. Navigate to **MCP** section
+4. Click **Add new MCP Server**
+5. Enter the following configuration:
 
-### Features
+```json
+{
+  "mcpServers": {
+    "endgame": {
+      "command": "npx",
+      "args": ["endgame-mcp@latest"],
+      "env": {
+        "API_KEY": "your_endgame_api_key"
+      }
+    }
+  }
+}
+```
 
-Take advantage of Cursor's AI features with our platform. 
+Replace `your_endgame_api_key` with your actual Endgame API key, which you can obtain from Endgame's [dashboard](https://dashboard.endgame.dev).
+
+## Verify Installation
+
+To confirm the MCP server has been correctly installed, you can check the MCP status within Cursor or look for the Endgame tools in the Cursor interface.
+
+Once configured, you can use the Endgame tools directly within Cursor conversations to manage your applications and deployments seamlessly. 

@@ -27,11 +27,11 @@ Run this command in your terminal. Be sure to use the `--scope user` flag to ins
 ```bash
 claude mcp add endgame \
   --scope user \
-  -e API_KEY=your_api_key \
+  -e API_KEY=your_endgame_api_key \
   -- npx endgame-mcp@latest
 ```
 
-Replace `your_api_key` with your actual Endgame API key, which you can obtain from our [dashboard](https://dashboard.endgame.dev).
+Replace `your_endgame_api_key` with your actual Endgame API key, which you can obtain from Endgame's [dashboard](https://dashboard.endgame.dev).
 
 ### Manual Configuration
 
@@ -46,13 +46,13 @@ Alternatively, you can manually add this configuration to your `.claude.json` fi
       "endgame-mcp@latest"
     ],
     "env": {
-      "API_KEY": "your_api_key"
+      "API_KEY": "your_endgame_api_key"
     }
   }
 }
 ```
 
-Replace `your_api_key` with your actual Endgame API key.
+Replace `your_endgame_api_key` with your actual Endgame API key, which you can get from [Endgame's dashboard](https://dashboard.endgame.dev).
 
 ## Verify Installation
 
