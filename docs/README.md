@@ -1,7 +1,7 @@
 ---
 layout: doc-layout.njk
 title: "Endgame - Documentation"
-titleMenu: "Documentation"
+titleMenu: "Overview"
 description: "Guides and reference materials to help you set up Endgame and its MCP to deploy endlessly with AI in tools like Cursor, Claude Code, Windsurf, and VS Code."
 keywords: "endgame documentation, getting started, mcp, ai agents, serverless, cursor, windsurf, claude code"
 active: "docs"
