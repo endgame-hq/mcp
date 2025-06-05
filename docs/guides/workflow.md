@@ -12,7 +12,7 @@ order: 1
 
 # Endgame MCP Development Workflow
 
-This guide explains the development workflow when using the Endgame MCP (Model Context Protocol) server with AI-powered IDEs like Cursor, Windsurf, and VS Code.
+This guide explains the development workflow when using the Endgame MCP (Model Context Protocol) server with AI-powered developer tools like Cursor, Claude Code, Windsurf, and VS Code.
 
 ## Overview
 

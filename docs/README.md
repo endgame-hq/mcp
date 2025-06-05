@@ -2,7 +2,7 @@
 layout: doc-layout.njk
 title: "Endgame - Documentation"
 titleMenu: "Documentation"
-description: "Guides and reference materials to help you set up Endgame to deploy endlessly with AI."
+description: "Guides and reference materials to help you set up Endgame and its MCP to deploy endlessly with AI in tools like Cursor, Claude Code, Windsurf, and VS Code."
 keywords: "endgame documentation, getting started, mcp, ai agents, serverless, cursor, windsurf, claude code"
 active: "docs"
 permalink: "/docs/"
@@ -12,12 +12,12 @@ order: 1
 
 **Endgame** is a purpose-built cloud platform designed exclusively for AI Agents. Unlike traditional cloud services built for human workflows, Endgame is architected to operate at the speed and scale AI demands. Its mission is simple: enable AI to deliver software 100x faster—at the pace AI can think, iterate, and build.
 
-By integrating directly into AI-augmented development tools like Cursor, Windsurf, VS Code, and Claude Code, Endgame removes the infrastructure bottlenecks that slow down modern software development. It gives AI Agents everything they need to autonomously create, deploy, test, and refine software without human friction.
+Endgame uses a powerful MCP to integrate directly into AI-augmented development tools like Cursor, Windsurf, VS Code, and Claude Code, and give AI Agents everything they need to autonomously create, deploy, test, and refine software at unprecedented speed.
 
 **To get started, pick the tool you wish to set up Endgame with:**
 
 * [Cursor](guides/cursor/)
-* [Claude Code]()
+* [Claude Code](guides/claude-code)
 * [VSCode](guides/vscode/)
 * [Windsurf](guides/windsurf/)
 
