@@ -10,21 +10,41 @@ docPath: "/guides/vscode"
 order: 5
 ---
 
-# VS Code Guide
+Visual Studio Code is a versatile code editor that can be enhanced with AI capabilities through MCP servers. By adding Endgame, you'll enable VS Code to seamlessly deploy any code that it writes.
 
-## VS Code Setup
+## Install VS Code
 
-Learn how to set up and use our platform with Visual Studio Code.
+If you don't already have VS Code installed, download it from the [official VS Code website](https://code.visualstudio.com/) and follow their installation guide.
 
-### Installation
+## Add Endgame MCP Server
 
-Follow these steps to install the VS Code extension:
+To add the Endgame MCP server to VS Code, you'll need to modify your VS Code settings:
 
 1. Open VS Code
-2. Go to Extensions
-3. Search for our extension
-4. Install and reload
+2. Go to **File** > **Preferences** > **Settings** (or press `Ctrl/Cmd + ,`)
+3. Click the **Open Settings (JSON)** button in the top right corner
+4. Add the following configuration to your `settings.json`:
 
-### Configuration
+```json
+{
+  "mcp": {
+    "servers": {
+      "endgame": {
+        "command": "npx",
+        "args": ["endgame-mcp@latest"],
+        "env": {
+            "API_KEY": "your_endgame_api_key"
+        }
+      }
+    }
+  }
+}
+```
 
-Configure the extension with your API key and preferences. 
+Replace `your_endgame_api_key` with your actual Endgame API key, which you can obtain from Endgame's [dashboard](https://dashboard.endgame.dev).
+
+## Verify Installation
+
+To confirm the MCP server has been correctly installed, restart VS Code and check that the Endgame tools are available through your AI extensions or MCP-compatible tools.
+
+Once configured, you can use the Endgame tools directly within VS Code to manage your applications and deployments seamlessly. 
