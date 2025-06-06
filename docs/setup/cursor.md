@@ -18,7 +18,17 @@ If you don't already have Cursor installed, download it from the [official Curso
 
 ## Add Endgame MCP Server
 
-To add the Endgame MCP server to Cursor, follow these steps:
+### Quick Install (Recommended)
+
+Click this button to install the Endgame MCP server into Cursor with one click:
+
+<a href="cursor://anysphere.cursor-deeplink/mcp/install?name=Endgame&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyJlbmRnYW1lLW1jcEBsYXRlc3QiXSwiZW52Ijp7IkFQSV9LRVkiOiIifX0=" class="unstyled-link" style="text-decoration: none !important; border: none !important; outline: none !important; color: inherit !important;"><img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add Endgame MCP server to Cursor" height="32" /></a>
+
+After installation, you'll need to add your API key to the environment variable. You can get your API key from Endgame's [dashboard](https://dashboard.endgame.dev).
+
+### Manual Installation
+
+Alternatively, you can manually add the Endgame MCP server to Cursor by following these steps:
 
 1. Open Cursor
 2. Go to **Cursor Settings** 
