@@ -17,8 +17,6 @@ The Endgame MCP provides several tools for managing application deployments. Eac
 
 Sets up the app directory for deployment to the Endgame platform by ensuring a dotfile exists with essential details.
 
-**When to use:** Only run this when an error from another tool suggests to run this.
-
 ### Parameters
 
 | Parameter | Type | Required | Description |
@@ -31,11 +29,6 @@ Sets up the app directory for deployment to the Endgame platform by ensuring a d
 ## review-app
 
 Reviews your app and provides specific instructions, guidance and examples for building and deploying apps for the Endgame platform based on the details you provide.
-
-**When to use:** 
-- ALWAYS call before calling the "deploy" tool to ensure deployment is successful
-- ALWAYS include ALL frameworks, languages, and package managers used in the app
-- Generally call before starting development to get guidance on building compliant apps
 
 ### Parameters
 
@@ -52,14 +45,6 @@ Reviews your app and provides specific instructions, guidance and examples for b
 ## deploy-app
 
 Deploys an application to the Endgame platform which will host it on a cloud server.
-
-**Important Requirements:**
-- ALWAYS call the "review" tool before calling this tool
-- ALWAYS ensure your app is a web server listening on port 8080
-- ALWAYS ensure the runtime is Node.js, version 22.x
-- ALWAYS ensure the 'appSourcePath' parameter is the absolute path to the root of the app's source code directory (not a build output directory)
-- ALWAYS ensure the buildCommand includes the install command for the package manager used in the app
-- NEVER run any build, export, or install commands locally before deployment
 
 ### Parameters
 
