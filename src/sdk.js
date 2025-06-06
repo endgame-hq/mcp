@@ -303,6 +303,7 @@ export async function getPresignedUrl({ zipFilename, appSourcePath }) {
  * @param {string} [params.branch] - Git branch name
  * @param {string} [params.description] - Deployment description
  * @param {string} [params.entrypoint] - Application entrypoint file
+ * @param {object} [params.testing] - Optional testing configuration with required path and optional test scenarios
  * @returns {Promise<object>} Deployment result
  */
 export async function deployApp({
@@ -313,6 +314,7 @@ export async function deployApp({
   branch,
   description,
   entrypoint,
+  testing,
 }) {
   // Resolve app name and account from dotfile
   const resolvedAppName = await resolveAppName({ appSourcePath });
@@ -352,6 +354,10 @@ export async function deployApp({
 
   if (entrypoint) {
     buildParams.entrypoint = entrypoint;
+  }
+
+  if (testing) {
+    buildParams.testing = testing;
   }
 
   // Call build endpoint
@@ -711,6 +717,40 @@ export async function deleteApp({ appName, appSourcePath }) {
 
   const result = await response.json();
   return result;
+}
+
+/**
+ * Polls for deployment test results.
+ * Makes requests every second for up to 1 minute to retrieve test results.
+ * Automatically resolves org name and ID from dotfile.
+ *
+ * @param {object} params - The parameters object
+ * @param {string} params.deploymentId - The deployment ID to check for test results
+ * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
+ * @returns {Promise<object>} Test results or error after timeout
+ */
+export async function getDeploymentTestResults({
+  deploymentId,
+  appSourcePath,
+}) {
+  if (!deploymentId) {
+    throw new Error('Deployment ID is required');
+  }
+
+  // Resolve account and get current org
+  const { currentOrg } = await resolveAccountData({ appSourcePath });
+
+  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/deployments/${deploymentId}/test-results`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to get test results: ${response.status} ${response.statusText}`
+    );
+  }
+
+  return await response.json();
 }
 
 /**
