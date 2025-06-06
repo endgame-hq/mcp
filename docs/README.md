@@ -10,7 +10,9 @@ docPath: "/"
 order: 1
 ---
 
-**Endgame** is a purpose-built cloud platform designed exclusively for AI Agents. Unlike traditional cloud services built for human workflows, Endgame is architected to operate at the speed and scale AI demands. Its mission is simple: enable AI to deliver software 100x faster—at the pace AI can think, iterate, and build.
+<a href="cursor://anysphere.cursor-deeplink/mcp/install?name=Endgame&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyJlbmRnYW1lLW1jcEBsYXRlc3QiXSwiZW52Ijp7IkFQSV9LRVkiOiIifX0=" class="unstyled-link" style="text-decoration: none !important; border: none !important; outline: none !important; color: inherit !important;"><img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add Endgame MCP server to Cursor" height="32" /></a>
+
+**Endgame** is a purpose-built cloud platform designed exclusively for AI Agents. Its mission is simple: enable AI to deliver software 100x faster—at the pace AI can think, build, and test.
 
 Endgame uses a powerful MCP to integrate directly into AI-augmented development tools like Cursor, Windsurf, VS Code, and Claude Code, and give AI Agents everything they need to autonomously create, deploy, test, and refine software at unprecedented speed.
 

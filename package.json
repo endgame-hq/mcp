@@ -1,7 +1,8 @@
 {
   "name": "endgame-mcp",
-  "version": "0.0.9",
-  "author": "endgame.dev",
+  "version": "0.0.10",
+  "author": "Serverless Inc",
+  "homepage": "https://endgame.dev",
   "keywords": [
     "mcp",
     "mcp-server",
@@ -14,6 +15,14 @@
     "cloud",
     "paas"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endgame-hq/mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/endgame-hq/mcp/issues"
+  },
+  "documentation": "https://endgame.dev/docs",
   "publishConfig": {
     "access": "public"
   },
