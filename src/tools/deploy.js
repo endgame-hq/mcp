@@ -1,5 +1,5 @@
 import { deployApp } from '../sdk.js';
-import { determineEnvFileAndBranch, getEnvFileAndBranch } from '../utils/fs.js';
+import { getEnvFileAndBranch } from '../utils/fs.js';
 
 /**
  * Deploy tool that handles application deployment via the SDK.
@@ -13,6 +13,7 @@ import { determineEnvFileAndBranch, getEnvFileAndBranch } from '../utils/fs.js';
  * @param {string} [params.deploymentDescription] - Deployment description
  * @param {string} [params.gitBranch] - Git branch
  * @param {string} [params.entrypointFile] - Application entrypoint file
+ * @param {object} [params.testing] - Optional testing configuration with path and optional test scenarios
  * @returns {Promise<object>} MCP formatted response
  */
 export async function deployTool(params) {
@@ -25,6 +26,7 @@ export async function deployTool(params) {
       buildArtifactPath,
       deploymentDescription: description,
       gitBranch: explicitBranch,
+      testing,
     } = params;
 
     // If the appSourcePath is the same as the buildArtifactPath, set buildArtifactPath to '.'
@@ -58,6 +60,7 @@ export async function deployTool(params) {
       branch,
       description,
       entrypoint: params.entrypointFile,
+      testing,
     });
 
     console.error(`[MCP SERVER] /deploy request sent at: ${buildRequestTime}`);
