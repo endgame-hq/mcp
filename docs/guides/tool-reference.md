@@ -2,16 +2,12 @@
 layout: doc-layout.njk
 title: "Endgame - Documentation - Tool Reference"
 titleMenu: "Tool Reference"
-description: "The tools made available within the Endgame MCP as well as their inputs"
+description: "The Endgame MCP provides several tools for managing application deployments. Each tool is designed to work seamlessly with AI agents to automate the deployment workflow."
 active: "docs"
 permalink: "/docs/guides/tool-reference/"
 docPath: "/guides/tool-reference"
 order: 2
 ---
-
-# Tool Reference
-
-The Endgame MCP provides several tools for managing application deployments. Each tool is designed to work seamlessly with AI agents to automate the deployment workflow.
 
 ## setup-app
 
@@ -23,8 +19,6 @@ Sets up the app directory for deployment to the Endgame platform by ensuring a d
 |-----------|------|----------|-------------|
 | `appSourcePath` | `string` | Yes | Absolute path to the root of the app source code directory |
 | `appName` | `string` | Yes | App name. Lowercase, alphanumeric characters and dashes only. Between 3-20 characters. Come up with an app name that fits the product and meets the criteria |
-
----
 
 ## review-app
 
@@ -39,8 +33,6 @@ Reviews your app and provides specific instructions, guidance and examples for b
 | `language` | `string` | No | Programming language (e.g., javascript, typescript) |
 | `packageManager` | `string` | No | Package manager (e.g., npm, yarn, pnpm) |
 | `frameworks` | `array of strings` | No | Frameworks used in the app (e.g., express, bun, nextjs, remix, sveltekit, react) |
-
----
 
 ## deploy-app
 
@@ -57,8 +49,6 @@ Deploys an application to the Endgame platform which will host it on a cloud ser
 | `entrypointFile` | `string` | No | `index.js` | Path to the entrypoint file (relative to build artifact directory), e.g. 'index.js' or 'main.js' |
 | `deploymentDescription` | `string` | Yes | - | Description of the app use-case and changes made in this deployment. Minimum 240 characters required |
 
----
-
 ## interact-with-app
 
 Call an App and respective Branch's endpoint and stream logs. Returns a stringified JSON object: `{ branchUrl, response, logs }`.
@@ -74,7 +64,6 @@ Call an App and respective Branch's endpoint and stream logs. Returns a stringif
 | `method` | `string` | No | - | HTTP method for the request |
 | `body` | `any` | No | - | Request body |
 
----
 
 ## list-apps
 
@@ -85,8 +74,6 @@ List all deployed apps within an organization.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `appSourcePath` | `string` | Yes | Absolute path to the root of an app's source code directory. If not submitted, defaults to listing apps from the user's personal organization |
-
----
 
 ## delete-app
 
