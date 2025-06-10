@@ -5,7 +5,7 @@ import { setupTool } from './tools/setup.js';
 import { deployTool } from './tools/deploy.js';
 import { appsTool } from './tools/apps.js';
 import { deleteAppTool } from './tools/deleteApp.js';
-import { interactTool } from './tools/interact.js';
+// import { interactTool } from './tools/interact.js';
 import { postDeployTool } from './tools/postDeploy.js';
 // import { deploymentsTool } from './tools/deployments.js';
 // import { versionsTool } from './tools/versions.js';
@@ -91,8 +91,9 @@ export function createServer() {
    */
   server.tool(
     'deploy-app',
-    `Deploys an application to the Endgame platform which will host it on a cloud server.
-- ALWAYS call the "review" tool before calling the "deploy" tool to ensure deployment is successful.
+    `Deploys an application to the Endgame platform which will host it on a cloud server, and then tests it in the cloud.
+- ALWAYS call the "review" tool before calling the "deploy" tool to get guidance on how to build and deploy your app to ensure the work is compliant with the Endgame platform.
+- ALWAYS call the "post-deploy" tool after the "deploy" tool to get the test results.
 - ALWAYS ensure your app is a web server listening on port 8080. Apps without a back-end server (e.g. only static site files) are not supported.
 - ALWAYS ensure the runtime is Node.js, version 22.x.
 - ALWAYS ensure the 'appSourcePath' parameter is the absolute path to the root of the app's source code directory (not a build output directory).
@@ -162,9 +163,9 @@ export function createServer() {
   server.tool(
     'post-deploy',
     `Polls for deployment test results.
-     ALWAYS call this after the "deploy" tool but print "deploy" tool output first.
-     BEFORE calling this tool, inform the user that the application is currently being tested and that they will be notified once the results are available.
-     Once the test results are returned, notify the user and provide a summary of the findings.`,
+- ALWAYS call this after the "deploy" tool, but print "deploy" tool output first.
+- BEFORE calling this tool, inform the user that the application is currently being tested and that they will be notified once the results are available.
+- Once the test results are returned, notify the user and provide a summary of the findings.`,
     {
       deploymentId: z.string().describe('The deployment ID'),
       appSourcePath: z
@@ -205,28 +206,28 @@ export function createServer() {
    * Tool: Interact
    *
    */
-  server.tool(
-    'interact-with-app',
-    `Call an App and respective Branch's endpoint and stream logs. Returns a stringified JSON object: { branchUrl, response, logs }.`,
-    {
-      gitBranch: z
-        .string()
-        .optional()
-        .default('main')
-        .describe('Branch name (default: main)'),
-      requestHeaders: z
-        .any()
-        .optional()
-        .describe('Headers to include in the request'),
-      apiPath: z.string().optional().describe('Path to call on the app'),
-      method: z.string().optional().describe('HTTP method for the request'),
-      body: z.any().optional().describe('Request body'),
-      appSourcePath: z
-        .string()
-        .describe('Absolute path to the root of the app source code directory'),
-    },
-    errorHandler(interactTool)
-  );
+//   server.tool(
+//     'interact-with-app',
+//     `Call an App and respective Branch's endpoint and stream logs. Returns a stringified JSON object: { branchUrl, response, logs }.`,
+//     {
+//       gitBranch: z
+//         .string()
+//         .optional()
+//         .default('main')
+//         .describe('Branch name (default: main)'),
+//       requestHeaders: z
+//         .any()
+//         .optional()
+//         .describe('Headers to include in the request'),
+//       apiPath: z.string().optional().describe('Path to call on the app'),
+//       method: z.string().optional().describe('HTTP method for the request'),
+//       body: z.any().optional().describe('Request body'),
+//       appSourcePath: z
+//         .string()
+//         .describe('Absolute path to the root of the app source code directory'),
+//     },
+//     errorHandler(interactTool)
+//   );
 
   /**
    *
