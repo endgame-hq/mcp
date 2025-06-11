@@ -1,12 +1,12 @@
 ---
 layout: doc-layout.njk
-title: "Endgame - Documentation - VS Code Integration Guide"
-titleMenu: "VS Code"
-description: "Learn how to set up and use Endgame with Visual Studio Code. Complete guide for configuring the extension and developing with AI assistance."
-keywords: "endgame vscode, visual studio code, vscode extension, ai coding, mcp server, development setup"
-active: "docs"
-permalink: "/docs/guides/vscode/"
-docPath: "/guides/vscode"
+title: 'Endgame - Documentation - VS Code Integration Guide'
+titleMenu: 'VS Code'
+description: 'Learn how to set up and use Endgame with Visual Studio Code. Complete guide for configuring the extension and developing with AI assistance.'
+keywords: 'endgame vscode, visual studio code, vscode extension, ai coding, mcp server, development setup'
+active: 'docs'
+permalink: '/docs/guides/vscode/'
+docPath: '/guides/vscode'
 order: 5
 ---
 
@@ -33,7 +33,7 @@ To add the Endgame MCP server to VS Code, you'll need to modify your VS Code set
         "command": "npx",
         "args": ["endgame-mcp@latest"],
         "env": {
-            "API_KEY": "your_endgame_api_key"
+          "API_KEY": "your_endgame_api_key"
         }
       }
     }
@@ -47,4 +47,4 @@ Replace `your_endgame_api_key` with your actual Endgame API key, which you can o
 
 To confirm the MCP server has been correctly installed, restart VS Code and check that the Endgame tools are available through your AI extensions or MCP-compatible tools.
 
-Once configured, you can use the Endgame tools directly within VS Code to manage your applications and deployments seamlessly. 
+Once configured, you can use the Endgame tools directly within VS Code to manage your applications and deployments seamlessly.
