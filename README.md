@@ -1,4 +1,5 @@
-# Endgame MCP
+![github](https://github.com/user-attachments/assets/72708ed2-ab7e-49b4-8bb4-00c452ab4a44)
+
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=Endgame&config=eyJjb21tYW5kIjoibnB4IGVuZGdhbWUtbWNwQGxhdGVzdCIsImVudiI6eyJBUElfS0VZIjoiIn19)
 
