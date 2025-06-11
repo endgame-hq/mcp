@@ -5,6 +5,6 @@
 
 Endgame is the first cloud platform designed to be used by AI Agents, enabling them to deploy rapidly, auto-test and self heal your apps.
 
-Endgame uses this MCP to integrate directly into AI Agents in development tools like Cursor, Windsurf, VS Code, and Claude Code.
+Endgame uses an MCP to integrate directly into AI Agents in development tools like Cursor, Windsurf, VS Code, and Claude Code, and empower them to deploy software endlessly.
 
 Learn more at [endgame.dev](https://endgame.dev)
