@@ -1,7 +1,7 @@
 // Helper for authenticated requests to the Management API
 import fs from 'fs';
 import path from 'path';
-import { zipDirectory } from './utils/zip.js';
+import { createTempZip } from './utils/zip.js';
 import { log } from './utils/logger.js';
 
 // Global configuration
@@ -329,65 +329,60 @@ export async function deployApp({
     appSourcePath,
   });
 
-  // Create zip file from source directory
-  const tmpZipPath = path.join(appSourcePath, `tmp-${Date.now()}.zip`);
-
-  // Prepare additional files (env file injection)
+  // Create zip file from source directory using temp directory
   const additionalFiles = envFilePath
     ? [{ src: envFilePath, dest: '.env' }]
     : [];
 
-  await zipDirectory(appSourcePath, tmpZipPath, additionalFiles);
+  const { zipPath: tmpZipPath, cleanup } = await createTempZip(
+    appSourcePath,
+    additionalFiles,
+    `${resolvedAppName}-`
+  );
 
-  // Upload zip file to S3
-  await uploadZipFile(tmpZipPath, presignedUrl);
-
-  // Prepare build parameters
-  const buildParams = {
-    s3Url: presignedUrl.split('?')[0],
-    name: resolvedAppName,
-    buildCommand,
-    buildArtifactPath,
-    branch,
-    description,
-  };
-
-  if (entrypoint) {
-    buildParams.entrypoint = entrypoint;
-  }
-
-  if (testing) {
-    buildParams.testing = testing;
-  }
-
-  // Call build endpoint
-  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/deploy`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(buildParams),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Deployment failed: ${response.status} ${response.statusText}`
-    );
-  }
-
-  const result = await response.json();
-
-  // Clean up temporary zip file
   try {
-    fs.unlinkSync(tmpZipPath);
-  } catch (error) {
-    log('sdk.error', {
-      message: 'Failed to clean up temporary zip file',
-      error: error.message,
-    });
-  }
+    // Upload zip file to S3
+    await uploadZipFile(tmpZipPath, presignedUrl);
 
-  return result;
+    // Prepare build parameters
+    const buildParams = {
+      s3Url: presignedUrl.split('?')[0],
+      name: resolvedAppName,
+      buildCommand,
+      buildArtifactPath,
+      branch,
+      description,
+    };
+
+    if (entrypoint) {
+      buildParams.entrypoint = entrypoint;
+    }
+
+    if (testing) {
+      buildParams.testing = testing;
+    }
+
+    // Call build endpoint
+    const response = await fetchManagementApi(`/orgs/${currentOrg.id}/deploy`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(buildParams),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Deployment failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const result = await response.json();
+    return result;
+  } finally {
+    // Always clean up temporary zip file, even on error
+    await cleanup();
+  }
 }
 
 /**
