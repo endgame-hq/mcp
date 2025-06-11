@@ -1,12 +1,12 @@
 ---
 layout: doc-layout.njk
-title: "Endgame - Documentation - Claude Code Setup Guide"
-titleMenu: "Claude Code"
-description: "Learn how to set up and use Endgame with Claude Code AI. Complete guide for configuring the MCP server and developing with AI assistance."
-keywords: "endgame, claude code, claude code ai, claude code integration, claude code mcp, ai coding, mcp server, claude code setup"
-active: "docs"
-permalink: "/docs/guides/claude-code/"
-docPath: "/guides/claude-code"
+title: 'Endgame - Documentation - Claude Code Setup Guide'
+titleMenu: 'Claude Code'
+description: 'Learn how to set up and use Endgame with Claude Code AI. Complete guide for configuring the MCP server and developing with AI assistance.'
+keywords: 'endgame, claude code, claude code ai, claude code integration, claude code mcp, ai coding, mcp server, claude code setup'
+active: 'docs'
+permalink: '/docs/guides/claude-code/'
+docPath: '/guides/claude-code'
 order: 3
 ---
 
@@ -65,4 +65,3 @@ claude
 ```
 
 Once configured, you can use the Endgame tools directly within Claude Code conversations to manage your applications and deployments seamlessly.
-

@@ -1,12 +1,12 @@
 ---
 layout: doc-layout.njk
-title: "Endgame - Documentation - Windsurf IDE Integration Guide"
-titleMenu: "Windsurf"
-description: "Learn how to set up and use Endgame with Windsurf IDE. Complete guide for configuring the MCP server and developing with AI assistance."
-keywords: "endgame windsurf, windsurf ide, windsurf integration, ai coding, mcp server, windsurf setup"
-active: "docs"
-permalink: "/docs/guides/windsurf/"
-docPath: "/guides/windsurf"
+title: 'Endgame - Documentation - Windsurf IDE Integration Guide'
+titleMenu: 'Windsurf'
+description: 'Learn how to set up and use Endgame with Windsurf IDE. Complete guide for configuring the MCP server and developing with AI assistance.'
+keywords: 'endgame windsurf, windsurf ide, windsurf integration, ai coding, mcp server, windsurf setup'
+active: 'docs'
+permalink: '/docs/guides/windsurf/'
+docPath: '/guides/windsurf'
 order: 4
 ---
 
@@ -44,4 +44,4 @@ Replace `your_endgame_api_key` with your actual Endgame API key, which you can o
 
 To confirm the MCP server has been correctly installed, restart Windsurf and check that the Endgame tools are available in your AI conversations.
 
-Once configured, you can use the Endgame tools directly within Windsurf conversations to manage your applications and deployments seamlessly. 
+Once configured, you can use the Endgame tools directly within Windsurf conversations to manage your applications and deployments seamlessly.

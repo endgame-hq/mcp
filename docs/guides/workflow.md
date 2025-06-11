@@ -1,12 +1,12 @@
 ---
 layout: doc-layout.njk
-title: "Endgame - Documentation - Development Workflow"
-titleMenu: "Workflow"
-description: "A guide on the ideal development workflow when using Endgame with Cursor, Windsurf, VSCode & more."
-keywords: "endgame workflow, development workflow, deployment, branches, previews, environments, stages, git, git integration"
-active: "docs"
-permalink: "/docs/guides/workflow/"
-docPath: "/guides/workflow"
+title: 'Endgame - Documentation - Development Workflow'
+titleMenu: 'Workflow'
+description: 'A guide on the ideal development workflow when using Endgame with Cursor, Windsurf, VSCode & more.'
+keywords: 'endgame workflow, development workflow, deployment, branches, previews, environments, stages, git, git integration'
+active: 'docs'
+permalink: '/docs/guides/workflow/'
+docPath: '/guides/workflow'
 order: 1
 ---
 
@@ -47,7 +47,7 @@ This `.endgame` file is not meant to be edited manually. Simply guide your AI to
 
 Most deployment challenges can be avoided by simply reviewing the application beforehand and ensuring it meets the criteria needed to run successfully on the host.
 
-Endgame reviews your application automatically for this reason before every deployment. It knows to call the `review` tool which relies on AI to answer a questionnaire about the application. The `review` tool responds with requirements and best practices for the technologies and use-cases in your application. 
+Endgame reviews your application automatically for this reason before every deployment. It knows to call the `review` tool which relies on AI to answer a questionnaire about the application. The `review` tool responds with requirements and best practices for the technologies and use-cases in your application.
 
 For example, if it is a Hono.js application, specific guidance for Hono will be given back to the AI. Or if it's a TypeScript application, specific guidance on the right build command will be given back. This guidance is then used by the AI in your developer tool to adjust your application to ensure deployment is successful. A classic example is ensuring the server exposes port 8080.
 
@@ -66,6 +66,7 @@ After `review` the AI will call `deploy` tool from Endgame. This will perform th
 A few key inputs that are given to the `deploy` tool and are automatically filled in via your AI are:
 
 #### Build Configuration
+
 - **Build Command**: Typically `npm install && npm run build`
 - **Build Artifact Path**: Directory containing built application (e.g., `dist`, `build`)
 - **Entrypoint File**: Main application file (defaults to `index.js`)
@@ -87,5 +88,3 @@ Every application with Endgame can have infinite branches. Currently, branches a
 You can also instruct Endgame to use a different deployment branch to explore an idea. But as a best practice we recommend creating a traditional git branch first, and letting Endgame safely deploy to that.
 
 Branches can be used to create traditional environments, stages, previews, testing branches, etc.
-
-

@@ -1,12 +1,12 @@
 ---
 layout: doc-layout.njk
-title: "Endgame - Documentation"
-titleMenu: "Overview"
-description: "Guides and reference materials to help you set up Endgame and its MCP to deploy endlessly with AI in tools like Cursor, Claude Code, Windsurf, and VS Code."
-keywords: "endgame documentation, getting started, mcp, ai agents, serverless, cursor, windsurf, claude code"
-active: "docs"
-permalink: "/docs/"
-docPath: "/"
+title: 'Endgame - Documentation'
+titleMenu: 'Overview'
+description: 'Guides and reference materials to help you set up Endgame and its MCP to deploy endlessly with AI in tools like Cursor, Claude Code, Windsurf, and VS Code.'
+keywords: 'endgame documentation, getting started, mcp, ai agents, serverless, cursor, windsurf, claude code'
+active: 'docs'
+permalink: '/docs/'
+docPath: '/'
 order: 1
 ---
 
@@ -18,10 +18,10 @@ Endgame uses a powerful MCP to integrate directly into AI-augmented development 
 
 **To get started, pick the tool you wish to set up Endgame with:**
 
-* [Cursor](guides/cursor/)
-* [Claude Code](guides/claude-code)
-* [VSCode](guides/vscode/)
-* [Windsurf](guides/windsurf/)
+- [Cursor](guides/cursor/)
+- [Claude Code](guides/claude-code)
+- [VSCode](guides/vscode/)
+- [Windsurf](guides/windsurf/)
 
 ## Key Features
 
@@ -57,16 +57,16 @@ Each deployment is tested automatically. Failures are returned with structured d
 
 Endgame is optimized for fast, autonomous deployment across a range of modern web workloads. Typical use cases include:
 
-* **Back-end services** built with Node.js or TypeScript, using frameworks like Express, Hono, NestJS, Fastify, and others.
-* **Front-end applications** using JavaScript or TypeScript with frameworks such as React, Next.js, Svelte, and Eleventy.
-* **Webhooks** for services like Stripe, Zapier, and other third-party APIs.
-* **Integrations** and utility services that require rapid deployment and iteration.
+- **Back-end services** built with Node.js or TypeScript, using frameworks like Express, Hono, NestJS, Fastify, and others.
+- **Front-end applications** using JavaScript or TypeScript with frameworks such as React, Next.js, Svelte, and Eleventy.
+- **Webhooks** for services like Stripe, Zapier, and other third-party APIs.
+- **Integrations** and utility services that require rapid deployment and iteration.
 
 ## Get Started
 
 To get started, check out our [getting started](setup/) guide, or navigate to the specific tool you use.
 
-* [Cursor](guides/cursor/)
-* [Claude Code](guides/claude-code)
-* [VSCode](guides/vscode/)
-* [Windsurf](guides/windsurf/)
+- [Cursor](guides/cursor/)
+- [Claude Code](guides/claude-code)
+- [VSCode](guides/vscode/)
+- [Windsurf](guides/windsurf/)
