@@ -735,9 +735,12 @@ export async function getDeploymentTestResults({
   // Resolve account and get current org
   const { currentOrg } = await resolveAccountData({ appSourcePath });
 
-  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/deployments/${deploymentId}/test-results`, {
-    method: 'GET',
-  });
+  const response = await fetchManagementApi(
+    `/orgs/${currentOrg.id}/deployments/${deploymentId}/test-results`,
+    {
+      method: 'GET',
+    }
+  );
 
   if (!response.ok) {
     throw new Error(
