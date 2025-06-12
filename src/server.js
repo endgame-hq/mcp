@@ -118,52 +118,31 @@ export function createServer() {
         .describe(
           'A description of the app use-case, followed by the changes made in this deployment. Ensure a minimum of 240 characters. Example: "This is a full-stack codebase for a SaaS solution that hosts bots for the Slack messaging platform. This deployment includes changes to the home page and a new feature that allows users to select from a variety of templates to create a new Slack bot from. The templates area available via API within new API routes."'
         ),
-      testing: z
-        .object({
-          path: z
-            .string()
-            .describe(
-              'Required path to append to the app URL for testing (e.g., "/", "/login", "/dashboard", "/api/health"). Default testing for this path always captures: full-page screenshot, comprehensive test analysis with checks and validations, browser insights analysis from Chrome DevTools Protocol events, and server logs analysis.'
-            ),
-          mode: z
-            .enum(['browser', 'api'])
-            .default('browser')
-            .describe(
-              'Testing mode: "browser" for browser-based testing with screenshots and CDP events, "api" for API/server testing with HTTP requests and server logs only'
-            ),
-          method: z
-            .enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])
-            .default('GET')
-            .describe(
-              'HTTP method for API testing (default: GET). Only used in API mode.'
-            ),
-          body: z
-            .string()
-            .optional()
-            .describe(
-              'Request body for POST/PUT/PATCH requests. Should be a JSON string or raw body content. Only allowed for POST, PUT, and PATCH methods.'
-            ),
-          headers: z
-            .record(z.string())
-            .optional()
-            .describe(
-              'Custom HTTP headers as key-value pairs. Content-Type will be auto-set to application/json if body is provided and Content-Type is not specified.'
-            ),
-        })
-        .refine(
-          data => {
-            // Validate body is only used with appropriate methods
-            return !(
-              data.body && !['POST', 'PUT', 'PATCH'].includes(data.method)
-            );
-          },
-          {
-            message:
-              'Invalid configuration for selected mode: body only allowed for POST/PUT/PATCH methods',
+      testing: z.array(z.object({
+        path: z.string().describe('Path to append to the app URL for testing (e.g., "/", "/login", "/dashboard", "/api/health")'),
+        mode: z.enum(['browser', 'api']).describe('Testing mode: "browser" for browser-based testing with screenshots and CDP events, "api" for API/server testing with HTTP requests and server logs only'),
+        method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']).default('GET').optional().describe('HTTP method for API testing (default: GET). Only used in API mode.'),
+        body: z.string().optional().describe('Request body for POST/PUT/PATCH requests. Should be a JSON string or raw body content. Only allowed for POST, PUT, and PATCH methods.'),
+        headers: z.record(z.string()).optional().describe('Custom HTTP headers as key-value pairs. Content-Type will be auto-set to application/json if body is provided and Content-Type is not specified.'),
+      })).min(1, 'At least one test is required').max(5, 'Maximum 5 tests allowed').refine(data => {
+        // Validate configuration based on mode for each test
+        for (const testConfig of data) {
+          if (testConfig.mode === 'browser') {
+            // Browser mode should not have method (other than GET), body, or headers
+            if ((testConfig.method && testConfig.method !== 'GET') || testConfig.body || testConfig.headers) {
+              return false;
+            }
+          } else if (testConfig.mode === 'api') {
+            // API mode: validate body is only used with appropriate methods
+            if (testConfig.body && !['POST', 'PUT', 'PATCH'].includes(testConfig.method || 'GET')) {
+              return false;
+            }
           }
-        )
-        .optional()
-        .describe('Testing configuration with required path.'),
+        }
+        return true;
+      }, {
+        message: 'Invalid configuration for selected mode: browser mode only supports path, API mode supports method/body/headers per test'
+      }).optional().describe('Array of tests to run with path and mode-specific configuration.')
     },
     errorHandler(deployTool)
   );
@@ -285,11 +264,11 @@ export function createServer() {
 export async function runServerWithStdio() {
   // Initialize host detection at startup
   const hostType = initializeHostDetection();
-  
+
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  
+
   console.error(`[MCP] Successfully connected via ${hostType.toUpperCase()}`);
 }
 
