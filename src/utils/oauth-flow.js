@@ -12,7 +12,6 @@ export async function startDashboardAuthFlow() {
   try {
     const authUrl = `${dashboardUrl}/login?mcp_auth=true&callback_port=${port}`;
     
-    console.log(`Opening dashboard for authentication: ${authUrl}`);
     await open(authUrl);
     
     const apiKey = await Promise.race([
