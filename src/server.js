@@ -59,7 +59,7 @@ export function createServer() {
           'Frameworks used in the app (e.g., express, bun, nextjs, remix, sveltekit, react).'
         ),
     },
-    errorHandler(reviewTool)
+    reviewTool
   );
 
   /**
@@ -144,7 +144,7 @@ export function createServer() {
         message: 'Invalid configuration for selected mode: browser mode only supports path, API mode supports method/body/headers per test'
       }).optional().describe('Array of tests to run with path and mode-specific configuration.')
     },
-    errorHandler(deployTool)
+    deployTool
   );
 
   /**
@@ -166,7 +166,7 @@ export function createServer() {
           'Absolute path to the root of the app source code directory for resolving organization context.'
         ),
     },
-    errorHandler(postDeployTool)
+    postDeployTool
   );
 
   /**
@@ -210,7 +210,7 @@ export function createServer() {
           `Absolute path to the root of an app's source code directory. If this isn't submitted, it will default to listing app's from the user's personal organization.`
         ),
     },
-    errorHandler(appsTool)
+    appsTool
   );
 
   /**
@@ -229,7 +229,7 @@ export function createServer() {
           `Absolute path to the root of an app's source code directory for resolving organization context.`
         ),
     },
-    errorHandler(deleteAppTool)
+    deleteAppTool
   );
 
 

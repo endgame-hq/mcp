@@ -1,4 +1,4 @@
-import { listApps, validateDotFileExists } from '../sdk.js';
+import { listApps, validateDotFileExists, validateApiKey } from '../sdk.js';
 
 /**
  * List all branches grouped by app name for the authenticated organization.
@@ -10,6 +10,9 @@ import { listApps, validateDotFileExists } from '../sdk.js';
  * @returns {Promise<object>} A promise resolving to an object with a content property
  */
 export async function appsTool({ appSourcePath = process.cwd() } = {}) {
+  // Validate API key before proceeding
+  await validateApiKey();
+
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
   

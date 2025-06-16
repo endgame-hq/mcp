@@ -1,4 +1,4 @@
-import { review, validateDotFileExists, ensureDotFile } from '../sdk.js';
+import { review, validateDotFileExists, ensureDotFile, validateApiKey } from '../sdk.js';
 
 /**
  * Get examples for app development based on specified parameters.
@@ -16,6 +16,8 @@ import { review, validateDotFileExists, ensureDotFile } from '../sdk.js';
  * @returns {Promise<object>} A promise resolving to an object with a content property
  */
 export async function reviewTool(params) {
+  await validateApiKey();
+
   // Try to validate dotfile exists, but if it doesn't and we have appName, create it
   try {
     validateDotFileExists({ appSourcePath: params.appSourcePath });

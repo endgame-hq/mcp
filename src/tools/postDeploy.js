@@ -1,4 +1,4 @@
-import { getDeploymentTestResults, validateDotFileExists } from '../sdk.js';
+import { getDeploymentTestResults, validateDotFileExists, validateApiKey } from '../sdk.js';
 import { log } from '../utils/logger.js';
 
 /**
@@ -7,6 +7,9 @@ import { log } from '../utils/logger.js';
  * API key validation is handled by the errorHandler wrapper before this function is called.
  */
 export async function postDeployTool({ deploymentId, appSourcePath }) {
+  // Validate API key before proceeding
+  await validateApiKey();
+
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
   

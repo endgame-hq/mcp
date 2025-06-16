@@ -1,4 +1,4 @@
-import { deployApp, validateDotFileExists } from '../sdk.js';
+import { deployApp, validateDotFileExists, validateApiKey } from '../sdk.js';
 import { getEnvFileAndBranch } from '../utils/fs.js';
 
 /**
@@ -19,6 +19,9 @@ import { getEnvFileAndBranch } from '../utils/fs.js';
  */
 export async function deployTool(params) {
   console.error('[DEPLOY TOOL] called with params:', params);
+
+  // Validate API key before proceeding
+  await validateApiKey();
 
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath: params.appSourcePath });
