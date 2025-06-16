@@ -4,7 +4,7 @@ import { review, validateDotFileExists, ensureDotFile, validateApiKey } from '..
  * Get examples for app development based on specified parameters.
  * Uses the SDK to properly handle API communication.
  * Validates dotfile exists or creates it if appName is provided.
- * API key validation is handled by the errorHandler wrapper before this function is called.
+ * API key validation is handled directly within this function.
  *
  * @param {object} params - Input parameters
  * @param {string} params.appSourcePath - Directory path for resolving app and org from dotfile

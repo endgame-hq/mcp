@@ -6,7 +6,7 @@ import { deployTool } from './tools/deploy.js';
 import { validateTool } from './tools/validate.js';
 import { appsTool } from './tools/apps.js';
 import { deleteAppTool } from './tools/deleteApp.js';
-import { errorHandler } from './utils/errors.js';
+
 import { initializeHostDetection, getMCPHost } from './utils/mcp-host-detector.js';
 
 export function createServer() {

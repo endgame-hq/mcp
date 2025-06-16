@@ -5,7 +5,7 @@ import { getEnvFileAndBranch } from '../utils/fs.js';
  * Deploy tool that handles application deployment via the SDK.
  * Determines environment files and delegates all zipping and deployment to the SDK.
  * App name is resolved from the dotfile by the SDK.
- * API key validation is handled by the errorHandler wrapper before this function is called.
+ * API key validation is handled directly within this function.
  *
  * @param {object} params - Deployment parameters
  * @param {string} params.appSourcePath - Source directory path
