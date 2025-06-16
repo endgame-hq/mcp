@@ -8,9 +8,12 @@ import { log } from '../utils/logger.js';
  */
 export async function authenticateTool() {
   log('authenticate.start');
+  console.error('[DEBUG] authenticate tool starting');
   
   try {
+    console.error('[DEBUG] calling startDashboardAuthFlow');
     const apiKey = await startDashboardAuthFlow();
+    console.error('[DEBUG] startDashboardAuthFlow completed', { hasApiKey: !!apiKey, keyLength: apiKey?.length });
     log('authenticate.success', { hasApiKey: !!apiKey });
     
     return {
@@ -25,6 +28,7 @@ export async function authenticateTool() {
       ]
     };
   } catch (error) {
+    console.error('[DEBUG] authenticate tool error', { error: error.message, stack: error.stack });
     log('authenticate.error', { error: error.message });
     throw error;
   }
