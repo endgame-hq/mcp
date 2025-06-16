@@ -6,6 +6,7 @@ import { deployTool } from './tools/deploy.js';
 import { validateTool } from './tools/validate.js';
 import { appsTool } from './tools/apps.js';
 import { deleteAppTool } from './tools/deleteApp.js';
+import { authenticateTool } from './tools/authenticate.js';
 
 import { initializeHostDetection, getMCPHost } from './utils/mcp-host-detector.js';
 
@@ -242,6 +243,18 @@ export function createServer() {
         ),
     },
     deleteAppTool
+  );
+
+  /**
+   *
+   * Tool: Authenticate
+   *
+   */
+  server.tool(
+    'authenticate',
+    'Authenticate with Endgame to obtain and save an API key. This opens the dashboard in your browser for OAuth authentication and automatically saves the API key to ~/.endgamerc for future use.',
+    {},
+    authenticateTool
   );
 
 
