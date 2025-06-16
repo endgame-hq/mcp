@@ -41,7 +41,6 @@ export function writeGlobalConfig(data) {
     try {
       fs.chmodSync(tempPath, 0o600);
     } catch (chmodError) {
-      console.warn('Warning: Could not set file permissions on config file');
     }
     
     fs.renameSync(tempPath, GLOBAL_CONFIG_PATH);
@@ -62,7 +61,6 @@ export function getGlobalApiKey() {
     const config = readGlobalConfig();
     return config?.apiKey || null;
   } catch (error) {
-    console.warn(`Warning: Could not read global config: ${error.message}`);
     return null;
   }
 }

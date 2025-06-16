@@ -23,7 +23,6 @@ export async function usageTool({ orgName, dirPath = process.cwd() } = {}) {
       ],
     };
   } catch (error) {
-    console.error('[USAGE TOOL ERROR]', error);
     return {
       content: [
         {

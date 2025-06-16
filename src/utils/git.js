@@ -16,9 +16,7 @@ export async function getCurrentBranch(dir) {
     let rootDir;
     try {
       rootDir = await findRoot({ filepath: dir });
-      console.error('[GIT] Found git root:', rootDir);
     } catch (error) {
-      console.error('[GIT] Could not find git root:', error.message);
       return null;
     }
 
@@ -30,7 +28,6 @@ export async function getCurrentBranch(dir) {
 
     return currentBranch;
   } catch (error) {
-    console.error('[GIT] Error getting current branch:', error);
     if (error.message.includes('Could not find HEAD')) {
       return null;
     }
@@ -68,7 +65,6 @@ export async function getLastCommitHash(dir) {
     try {
       rootDir = await findRoot({ filepath: dir });
     } catch (error) {
-      console.error('[GIT] Could not find git root:', error.message);
       return null;
     }
 
@@ -80,7 +76,6 @@ export async function getLastCommitHash(dir) {
 
     return commitOid;
   } catch (error) {
-    console.error('[GIT] Error getting last commit hash:', error);
     throw error;
   }
 }

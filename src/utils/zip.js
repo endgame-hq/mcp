@@ -32,10 +32,8 @@ export async function cleanupTempZip(zipPath) {
   try {
     if (zipPath && fs.existsSync(zipPath)) {
       await rm(zipPath, { force: true });
-      console.log(`Cleaned up temporary zip file: ${zipPath}`);
     }
   } catch (error) {
-    console.error(`Failed to clean up temporary zip file ${zipPath}:`, error.message);
     // Don't throw - cleanup failures shouldn't break the main flow
   }
 }

@@ -18,8 +18,6 @@ import { getEnvFileAndBranch } from '../utils/fs.js';
  * @returns {Promise<object>} MCP formatted response
  */
 export async function deployTool(params) {
-  console.error('[DEPLOY TOOL] called with params:', params);
-
   // Validate API key before proceeding
   await validateApiKey();
 
@@ -46,18 +44,13 @@ export async function deployTool(params) {
     explicitBranch
   );
 
-  console.error(
-    '[DEPLOY TOOL] determined branch and env file:',
-    branch,
-    'envFilePath:',
-    envFilePath
-  );
+
 
   // Deploy using SDK (SDK handles all zipping, upload, and deployment)
   const buildRequestStart = Date.now();
   const buildRequestTime = new Date(buildRequestStart).toISOString();
 
-  console.error('[DEPLOY TOOL] calling deploy SDK method');
+
   const buildResult = await deployApp({
     appSourcePath,
     envFilePath,
@@ -69,14 +62,8 @@ export async function deployTool(params) {
     testing,
   });
 
-  console.error(`[MCP SERVER] /deploy request sent at: ${buildRequestTime}`);
-  console.error('[DEPLOY TOOL] deployment complete');
   const buildRequestEnd = Date.now();
   const buildRequestElapsed = buildRequestEnd - buildRequestStart;
-  console.error(
-    `[MCP SERVER] /deploy request duration: ${buildRequestElapsed} ms`
-  );
-  console.error('[DEPLOY TOOL] build result:', buildResult);
 
   return {
     content: [

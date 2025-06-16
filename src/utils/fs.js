@@ -16,7 +16,6 @@ export async function determineEnvFileAndBranch(codeDir) {
   const envFiles = files.filter(f => f.startsWith('.env'));
 
   const currentBranch = await getCurrentBranch(codeDir);
-  console.error('[FS UTILS] currentBranch:', currentBranch);
 
   // If branch is main/master OR dir is not git repository, use .env and "main" branch
   if (

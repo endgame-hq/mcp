@@ -46,7 +46,6 @@ export async function rollbackTool({
       ],
     };
   } catch (error) {
-    console.error('[ROLLBACK TOOL] Error:', error);
     return {
       content: [
         {

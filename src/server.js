@@ -293,8 +293,6 @@ export async function runServerWithStdio() {
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-
-  console.error(`[MCP] Successfully connected via ${hostType.toUpperCase()}`);
 }
 
 // Export the host detection function for use throughout the server
