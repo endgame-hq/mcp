@@ -5,7 +5,7 @@ import { saveGlobalApiKey } from './global-config.js';
 
 export async function startDashboardAuthFlow() {
   const isDev = process.env.NODE_ENV === 'development' || process.env.MANAGEMENT_API_URL?.includes('endgame-dev.dev');
-  const dashboardUrl = isDev ? 'https://dashboard.endgame-dev.dev' : 'https://endgame.dev';
+  const dashboardUrl = isDev ? 'https://dashboard.endgame-dev.dev' : 'https://dashboard.endgame-dev.dev';
   
   const { server, port, tokenPromise } = await startCallbackServer();
   
