@@ -546,7 +546,7 @@ export async function deleteApp({ appName, appSourcePath }) {
 }
 
 /**
- * Polls for deployment test results.
+ * Validates deployment test results by polling for completion.
  * Makes requests every second for up to 1 minute to retrieve test results.
  * Automatically resolves org name and ID from dotfile.
  *
@@ -555,7 +555,7 @@ export async function deleteApp({ appName, appSourcePath }) {
  * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
  * @returns {Promise<object>} Test results or error after timeout
  */
-export async function getDeploymentTestResults({
+export async function validate({
   deploymentId,
   appSourcePath,
 }) {
