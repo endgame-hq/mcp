@@ -252,7 +252,7 @@ export function createServer() {
    */
   server.tool(
     'authenticate',
-    'Authenticate with Endgame to obtain and save an API key. This opens the dashboard in your browser for OAuth authentication and automatically saves the API key to ~/.endgamerc for future use.',
+            'Authenticate with Endgame to obtain and save an API key. This opens the dashboard in your browser for OAuth authentication and automatically saves the API key to the global config file for future use.',
     {},
     authenticateTool
   );

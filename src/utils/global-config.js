@@ -2,13 +2,40 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-export const GLOBAL_CONFIG_FILENAME = '.endgamerc';
-export const GLOBAL_CONFIG_PATH = path.join(os.homedir(), GLOBAL_CONFIG_FILENAME);
+/**
+ * Determines if the current environment is development
+ * Based on NODE_ENV or if the MANAGEMENT_API_URL includes dev domains
+ */
+const isDevelopment = () => {
+  return process.env.NODE_ENV === 'development' || 
+         process.env.MANAGEMENT_API_URL?.includes('endgame-dev.dev');
+};
+
+/**
+ * Gets the appropriate global config filename based on environment
+ * Dev environment uses .endgamedevrc, prod uses .endgamerc
+ */
+const getGlobalConfigFilename = () => {
+  return isDevelopment() ? '.endgamedevrc' : '.endgamerc';
+};
+
+/**
+ * Gets the current global config filename (environment-aware)
+ */
+export const GLOBAL_CONFIG_FILENAME = getGlobalConfigFilename();
+
+/**
+ * Gets the current global config path (environment-aware)
+ */
+export const getGlobalConfigPath = () => {
+  return path.join(os.homedir(), getGlobalConfigFilename());
+};
 
 export function readGlobalConfig() {
   try {
-    fs.accessSync(GLOBAL_CONFIG_PATH, fs.constants.F_OK);
-    const fileContent = fs.readFileSync(GLOBAL_CONFIG_PATH, 'utf8');
+    const configPath = getGlobalConfigPath();
+    fs.accessSync(configPath, fs.constants.F_OK);
+    const fileContent = fs.readFileSync(configPath, 'utf8');
     return JSON.parse(fileContent);
   } catch (error) {
     if (error.code === 'ENOENT' || error.message.includes('ENOENT')) {
@@ -17,7 +44,7 @@ export function readGlobalConfig() {
     
     if (error instanceof SyntaxError) {
       throw new Error(
-        `Invalid JSON in ${GLOBAL_CONFIG_FILENAME} file. Fix the JSON and try again.`
+        `Invalid JSON in ${getGlobalConfigFilename()} file. Fix the JSON and try again.`
       );
     }
     
@@ -35,7 +62,8 @@ export function writeGlobalConfig(data) {
   
   try {
     ensureGlobalConfigDir();
-    const tempPath = `${GLOBAL_CONFIG_PATH}.tmp`;
+    const configPath = getGlobalConfigPath();
+    const tempPath = `${configPath}.tmp`;
     fs.writeFileSync(tempPath, JSON.stringify(mergedData, null, 2), 'utf8');
     
     try {
@@ -43,14 +71,15 @@ export function writeGlobalConfig(data) {
     } catch (chmodError) {
     }
     
-    fs.renameSync(tempPath, GLOBAL_CONFIG_PATH);
+    fs.renameSync(tempPath, configPath);
   } catch (error) {
-    throw new Error(`Failed to write ${GLOBAL_CONFIG_FILENAME} file: ${error.message}`);
+    throw new Error(`Failed to write ${getGlobalConfigFilename()} file: ${error.message}`);
   }
 }
 
 export function ensureGlobalConfigDir() {
-  const configDir = path.dirname(GLOBAL_CONFIG_PATH);
+  const configPath = getGlobalConfigPath();
+  const configDir = path.dirname(configPath);
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true, mode: 0o700 });
   }

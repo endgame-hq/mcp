@@ -1,5 +1,6 @@
 import { startDashboardAuthFlow } from '../utils/oauth-flow.js';
 import { log } from '../utils/logger.js';
+import { GLOBAL_CONFIG_FILENAME } from '../utils/global-config.js';
 
 /**
  * Tool: Authenticate
@@ -22,7 +23,7 @@ export async function authenticateTool() {
           type: 'text',
           text: JSON.stringify({
             success: true,
-            message: 'Authentication successful! API key has been saved to ~/.endgamerc. You can now use other Endgame tools.'
+            message: `Authentication successful! API key has been saved to ~/${GLOBAL_CONFIG_FILENAME}. You can now use other Endgame tools.`
           })
         }
       ]

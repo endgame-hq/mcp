@@ -1,7 +1,7 @@
 // Helper for authenticated requests to the Management API
 import { createTempZip } from './utils/zip.js';
 import { log } from './utils/logger.js';
-import { readDotFile, writeDotFile, ensureDotFile, DEFAULT_ORG, resolveAppName, validateDotFileExists } from './utils/dotfile.js';
+import { readDotFile, writeDotFile, ensureDotFile, DEFAULT_ORG, resolveAppName, validateDotFileExists } from './utils/local-config.js';
 import { findOrgByName } from './utils/organization.js';
 import { uploadZipFile } from './utils/upload.js';
 import { getMCPHost } from './utils/mcp-host-detector.js';
