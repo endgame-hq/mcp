@@ -274,12 +274,14 @@ export async function deployApp({
     });
 
     if (!response.ok) {
+      let errorMessage = `Deployment failed: ${response.status} ${response.statusText}`;
       try {
         const errorData = await response.json();
-        throw new Error(errorData.message || `Deployment failed: ${response.status} ${response.statusText}`);
+        errorMessage = errorData.message || errorMessage;
       } catch (parseError) {
-        throw new Error(`Deployment failed: ${response.status} ${response.statusText}`);
+        // JSON parsing failed, use the default error message
       }
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();
