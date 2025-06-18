@@ -10,8 +10,6 @@ import { listDeployments } from '../sdk.js';
  */
 export async function deploymentsTool({ appSourcePath } = {}) {
   try {
-    console.error('[DEPLOYMENTS TOOL] Fetching deployments');
-
     // Use SDK method to fetch deployments (SDK handles org resolution internally)
     const data = await listDeployments({
       appSourcePath,
@@ -26,7 +24,6 @@ export async function deploymentsTool({ appSourcePath } = {}) {
       ],
     };
   } catch (error) {
-    console.error('[DEPLOYMENTS TOOL ERROR]', error);
     return {
       content: [
         {

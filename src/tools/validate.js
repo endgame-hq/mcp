@@ -1,12 +1,15 @@
-import { validate, validateDotFileExists } from '../sdk.js';
+import { validate, validateDotFileExists, validateApiKey } from '../sdk.js';
 import { log } from '../utils/logger.js';
 
 /**
  * Tool: Validate
  * Validates deployment test results by polling for completion
- * API key validation is handled by the errorHandler wrapper before this function is called.
+ * API key validation is handled directly within this function.
  */
 export async function validateTool({ deploymentId, appSourcePath }) {
+  // Validate API key before proceeding
+  await validateApiKey();
+
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
   

@@ -1,6 +1,6 @@
 {
   "name": "endgame-mcp",
-  "version": "0.0.10",
+  "version": "0.1.3",
   "author": "Serverless Inc",
   "homepage": "https://endgame.dev",
   "keywords": [
@@ -37,6 +37,7 @@
     "dotenv": "^16.5.0",
     "isomorphic-git": "^1.30.1",
     "node-fetch": "^3.3.2",
+    "open": "^10.1.2",
     "p-limit": "^6.2.0",
     "yazl": "^3.3.1",
     "zod": "^3.22.4"

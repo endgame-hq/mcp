@@ -80,7 +80,6 @@ let detectedHost = null;
  */
 export function initializeHostDetection() {
   detectedHost = detectMCPHost();
-  console.error(`[MCP] Server started by: ${detectedHost}`);
   return detectedHost;
 }
 
@@ -100,12 +99,6 @@ export function getMCPHost() {
  */
 export function logMCPHostDetection() {
   const detection = detectMCPHost();
-  
-  console.error('[MCP HOST DETECTION]', JSON.stringify({
-    message: `MCP Server initiated by: ${detection}`,
-    hostType: detection,
-  }, null, 2));
-
   return detection;
 }
 
@@ -118,4 +111,4 @@ export function logMCPHostDetection() {
 export function isCursorMCPHost() {
   const detection = detectMCPHost();
   return detection === 'cursor';
-} 
+}  

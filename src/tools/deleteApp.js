@@ -1,10 +1,10 @@
-import { deleteApp, validateDotFileExists } from '../sdk.js';
+import { deleteApp, validateDotFileExists, validateApiKey } from '../sdk.js';
 
 /**
  * Deletes an app and all its related data (branches, versions, deployments, analytics).
  * This is a comprehensive cleanup operation that removes all traces of an app.
  * Uses the SDK to properly handle organization context and API communication.
- * API key validation is handled by the errorHandler wrapper before this function is called.
+ * API key validation is handled directly within this function.
  *
  * @param {object} params - Input parameters
  * @param {string} params.appName - The name of the app to delete
@@ -15,6 +15,9 @@ export async function deleteAppTool({
   appName,
   appSourcePath = process.cwd(),
 } = {}) {
+  // Validate API key before proceeding
+  await validateApiKey();
+
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
   

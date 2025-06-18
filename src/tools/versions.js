@@ -25,7 +25,6 @@ export const versionsTool = async ({ appSourcePath }) => {
       ],
     };
   } catch (error) {
-    console.error('[VERSIONS TOOL ERROR]', error);
     return {
       content: [
         {
