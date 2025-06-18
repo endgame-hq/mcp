@@ -7,8 +7,8 @@ import os from 'os';
  * Based on NODE_ENV or if the MANAGEMENT_API_URL includes dev domains
  */
 const isDevelopment = () => {
-  return process.env.NODE_ENV === 'development' || 
-         process.env.MANAGEMENT_API_URL?.includes('endgame-dev.dev');
+  return process.env.MANAGEMENT_API_URL && 
+  process.env.MANAGEMENT_API_URL.includes('endgame-dev.dev');
 };
 
 /**

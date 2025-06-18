@@ -9,13 +9,13 @@ import { log } from './logger.js';
  * Based on NODE_ENV or if the MANAGEMENT_API_URL includes dev domains
  */
 const isDevelopment = () => {
-  return process.env.NODE_ENV === 'development' || 
-         process.env.MANAGEMENT_API_URL?.includes('endgame-dev.dev');
+  return process.env.MANAGEMENT_API_URL && 
+  process.env.MANAGEMENT_API_URL.includes('endgame-dev.dev');
 };
 
 export async function startDashboardAuthFlow() {
   const isDev = isDevelopment();
-  const dashboardUrl = isDev ? 'https://dashboard.endgame-dev.dev' : 'https://dashboard.endgame-dev.dev';
+  const dashboardUrl = isDev ? 'https://dashboard.endgame-dev.dev' : 'https://dashboard.endgame.dev';
   
   const { server, port, tokenPromise } = await startCallbackServer();
   
