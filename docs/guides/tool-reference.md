@@ -84,3 +84,19 @@ Deletes an app and all its related data (branches, versions, deployments, analyt
 | --------------- | -------- | -------- | ---------------------------------------------------------------------------------------------- |
 | `appName`       | `string` | Yes      | The name of the app to delete                                                                  |
 | `appSourcePath` | `string` | Yes      | Absolute path to the root of an app's source code directory for resolving organization context |
+
+## merge-future-state
+
+Downloads and merges the latest future-state branch deployment with your local code. The future-state branch contains AI-generated improvements from the FutureState agent.
+
+**Note:** Requires your application directory to be a Git repository. Initialize with `git init` if needed.
+
+### Parameters
+
+| Parameter       | Type               | Required | Default | Description                                                                      |
+| --------------- | ------------------ | -------- | ------- | -------------------------------------------------------------------------------- |
+| `appSourcePath` | `string`           | Yes      | -       | Absolute path to the root of the app's source code directory                     |
+| `dryRun`        | `boolean`          | No       | `false` | If true, shows what would be merged without making changes                       |
+| `exclude`       | `array of strings` | No       | `[]`    | Additional file patterns to exclude from merge (e.g., ["*.config.js", "dist/*"]) |
+
+For a detailed guide on using this tool, see the [Merge Future State Guide](/docs/guides/merge-future-state/).
