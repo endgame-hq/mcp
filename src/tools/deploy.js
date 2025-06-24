@@ -1,5 +1,6 @@
 import { deployApp, validateDotFileExists, validateApiKey } from '../sdk.js';
 import { getEnvFileAndBranch } from '../utils/fs.js';
+import { parseEnvFile } from '../utils/env.js';
 
 /**
  * Deploy tool that handles application deployment via the SDK.
@@ -44,16 +45,12 @@ export async function deployTool(params) {
     explicitBranch
   );
 
-
-
-  // Deploy using SDK (SDK handles all zipping, upload, and deployment)
-  const buildRequestStart = Date.now();
-  const buildRequestTime = new Date(buildRequestStart).toISOString();
-
+  // Parse environment variables from the .env file
+  const envVars = parseEnvFile(envFilePath);
 
   const buildResult = await deployApp({
     appSourcePath,
-    envFilePath,
+    envVars,
     buildCommand,
     buildArtifactPath,
     branch,
@@ -61,9 +58,6 @@ export async function deployTool(params) {
     entrypoint: params.entrypointFile,
     testing,
   });
-
-  const buildRequestEnd = Date.now();
-  const buildRequestElapsed = buildRequestEnd - buildRequestStart;
 
   return {
     content: [

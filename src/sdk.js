@@ -176,7 +176,7 @@ export async function getPresignedUrl({ zipFilename, appSourcePath }) {
  *
  * @param {object} params - The parameters object
  * @param {string} params.appSourcePath - Directory path for resolving app/org from dotfile (also the source directory to zip)
- * @param {string} [params.envFilePath] - Path to environment file to inject as .env
+ * @param {object} [params.envVars] - Parsed environment variables object
  * @param {string} [params.buildCommand] - Build command to execute
  * @param {string} [params.buildArtifactPath] - Path to build artifacts
  * @param {string} [params.branch] - Git branch name
@@ -187,7 +187,7 @@ export async function getPresignedUrl({ zipFilename, appSourcePath }) {
  */
 export async function deployApp({
   appSourcePath,
-  envFilePath,
+  envVars,
   buildCommand,
   buildArtifactPath,
   branch,
@@ -209,13 +209,9 @@ export async function deployApp({
   });
 
   // Create zip file from source directory using temp directory
-  const additionalFiles = envFilePath
-    ? [{ src: envFilePath, dest: '.env' }]
-    : [];
-
   const { zipPath: tmpZipPath, cleanup } = await createTempZip(
     appSourcePath,
-    additionalFiles,
+    [],
     `${resolvedAppName}-`
   );
 
@@ -231,6 +227,7 @@ export async function deployApp({
       buildArtifactPath,
       branch,
       description,
+      envVars,
     };
 
     if (entrypoint) {
