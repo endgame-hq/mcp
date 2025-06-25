@@ -20,7 +20,7 @@ export async function deleteAppTool({
 
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
-  
+
   if (!appName) {
     throw new Error('App name is required for deletion');
   }

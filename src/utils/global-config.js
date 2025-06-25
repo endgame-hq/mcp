@@ -7,8 +7,10 @@ import os from 'os';
  * Based on NODE_ENV or if the MANAGEMENT_API_URL includes dev domains
  */
 const isDevelopment = () => {
-  return process.env.MANAGEMENT_API_URL && 
-  process.env.MANAGEMENT_API_URL.includes('endgame-dev.dev');
+  return (
+    process.env.MANAGEMENT_API_URL &&
+    process.env.MANAGEMENT_API_URL.includes('endgame-dev.dev')
+  );
 };
 
 /**
@@ -41,13 +43,13 @@ export function readGlobalConfig() {
     if (error.code === 'ENOENT' || error.message.includes('ENOENT')) {
       return null;
     }
-    
+
     if (error instanceof SyntaxError) {
       throw new Error(
         `Invalid JSON in ${getGlobalConfigFilename()} file. Fix the JSON and try again.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -56,24 +58,25 @@ export function writeGlobalConfig(data) {
   if (!data || typeof data !== 'object') {
     throw new Error('Invalid data provided to writeGlobalConfig');
   }
-  
+
   const existingData = readGlobalConfig() || {};
   const mergedData = { ...existingData, ...data };
-  
+
   try {
     ensureGlobalConfigDir();
     const configPath = getGlobalConfigPath();
     const tempPath = `${configPath}.tmp`;
     fs.writeFileSync(tempPath, JSON.stringify(mergedData, null, 2), 'utf8');
-    
+
     try {
       fs.chmodSync(tempPath, 0o600);
-    } catch (chmodError) {
-    }
-    
+    } catch (chmodError) {}
+
     fs.renameSync(tempPath, configPath);
   } catch (error) {
-    throw new Error(`Failed to write ${getGlobalConfigFilename()} file: ${error.message}`);
+    throw new Error(
+      `Failed to write ${getGlobalConfigFilename()} file: ${error.message}`
+    );
   }
 }
 
@@ -98,6 +101,6 @@ export function saveGlobalApiKey(apiKey) {
   if (!apiKey || typeof apiKey !== 'string') {
     throw new Error('Invalid API key provided');
   }
-  
+
   writeGlobalConfig({ apiKey });
 }
