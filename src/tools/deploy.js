@@ -44,12 +44,9 @@ export async function deployTool(params) {
     explicitBranch
   );
 
-
-
   // Deploy using SDK (SDK handles all zipping, upload, and deployment)
   const buildRequestStart = Date.now();
   const buildRequestTime = new Date(buildRequestStart).toISOString();
-
 
   const buildResult = await deployApp({
     appSourcePath,

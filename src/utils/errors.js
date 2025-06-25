@@ -28,7 +28,7 @@ export const errorHandler = toolFunction => {
     try {
       // ALWAYS validate API key first, before any other operations
       await validateApiKey();
-      
+
       // Execute the tool function and return its result
       return await toolFunction(params);
     } catch (error) {

@@ -11,7 +11,7 @@ export async function validateTool({ deploymentId, appSourcePath }) {
 
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
-  
+
   log('validate.start', { deploymentId });
 
   const result = await validate({

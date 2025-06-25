@@ -1,4 +1,9 @@
-import { review, validateDotFileExists, ensureDotFile, validateApiKey } from '../sdk.js';
+import {
+  review,
+  validateDotFileExists,
+  ensureDotFile,
+  validateApiKey,
+} from '../sdk.js';
 
 /**
  * Get examples for app development based on specified parameters.
@@ -26,7 +31,7 @@ export async function reviewTool(params) {
       // Re-throw the error if no appName provided
       throw error;
     }
-    
+
     // Create the dotfile with the provided appName
     await ensureDotFile({
       appSourcePath: params.appSourcePath,

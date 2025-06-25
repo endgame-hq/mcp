@@ -165,18 +165,18 @@ export async function resolveAppName({ appSourcePath }) {
  */
 export const validateDotFileExists = ({ appSourcePath }) => {
   const dotfileData = readDotFile({ appSourcePath });
-  
+
   if (!dotfileData) {
     throw new Error(
       'No ".endgame" file found in the root directory. Please call the "review-app" tool with an "appName" parameter and the ".endgame" file will be created for you and your app will be set up for deployment to Endgame. The app name must be lowercase, alphanumeric characters and dashes only, between 3-20 characters.'
     );
   }
-  
+
   if (!dotfileData.app) {
     throw new Error(
       'No "app" property found in ".endgame" file. Please call the "review-app" tool with an "appName" parameter to set up your app for deployment.'
     );
   }
-  
+
   return dotfileData;
-}; 
+};

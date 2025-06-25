@@ -15,7 +15,7 @@ export async function appsTool({ appSourcePath = process.cwd() } = {}) {
 
   // Validate that dotfile exists before proceeding
   validateDotFileExists({ appSourcePath });
-  
+
   // Use SDK method to fetch apps (SDK handles org resolution internally)
   const data = await listApps({ appSourcePath });
 

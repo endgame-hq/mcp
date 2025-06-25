@@ -26,4 +26,4 @@ export async function uploadZipFile(filePath, presignedUrl) {
   if (!response.ok) {
     throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
   }
-} 
+}

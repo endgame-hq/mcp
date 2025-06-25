@@ -22,4 +22,4 @@ export function findOrgByName(organizations, orgName) {
   }
 
   return org;
-} 
+}
