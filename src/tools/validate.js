@@ -1,4 +1,5 @@
-import { validate, validateDotFileExists, validateApiKey } from '../sdk.js';
+import { validate, validateApiKey } from '../sdk.js';
+import { validateDotFileExists } from '../utils/local-config.js';
 import { log } from '../utils/logger.js';
 
 /**
@@ -15,11 +16,32 @@ export async function validateTool({ deploymentId, appSourcePath }) {
   
   log('validate.start', { deploymentId });
 
-  const result = await validate({
-    deploymentId,
-    appSourcePath,
-  });
+  try {
+    const result = await validate({
+      deploymentId,
+      appSourcePath,
+    });
 
-  log('validate.success', { deploymentId, hasResults: !!result });
-  return { content: result.testResults };
+    log('validate.success', { deploymentId, hasResults: !!result });
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result),
+        },
+      ],
+    };
+  } catch (error) {
+    log('validate.error', { deploymentId, error: error.message });
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({ error: error.message }),
+        },
+      ],
+    };
+  }
 }

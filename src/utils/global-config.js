@@ -1,6 +1,34 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { randomUUID } from 'crypto';
+
+/**
+ * Gets the global config file
+ * 
+ * @returns {Object|null} The global config object or null if the file doesn't exist
+ * @throws {Error} If the file exists but is invalid JSON
+ */
+export function getGlobalConfig() {
+  try {
+    const configPath = getGlobalConfigPath();
+    fs.accessSync(configPath, fs.constants.F_OK);
+    const fileContent = fs.readFileSync(configPath, 'utf8');
+    return JSON.parse(fileContent);
+  } catch (error) {
+    if (error.code === 'ENOENT' || error.message.includes('ENOENT')) {
+      return null;
+    }
+
+    if (error instanceof SyntaxError) {
+      throw new Error(
+        `Invalid JSON in the global config file. Fix the JSON and try again. Error: ${error.message}`
+      );
+    }
+
+    throw error;
+  }
+}
 
 /**
  * Determines if the current environment is development
@@ -31,27 +59,6 @@ export const getGlobalConfigPath = () => {
   return path.join(os.homedir(), getGlobalConfigFilename());
 };
 
-export function readGlobalConfig() {
-  try {
-    const configPath = getGlobalConfigPath();
-    fs.accessSync(configPath, fs.constants.F_OK);
-    const fileContent = fs.readFileSync(configPath, 'utf8');
-    return JSON.parse(fileContent);
-  } catch (error) {
-    if (error.code === 'ENOENT' || error.message.includes('ENOENT')) {
-      return null;
-    }
-    
-    if (error instanceof SyntaxError) {
-      throw new Error(
-        `Invalid JSON in ${getGlobalConfigFilename()} file. Fix the JSON and try again.`
-      );
-    }
-    
-    throw error;
-  }
-}
-
 export function writeGlobalConfig(data) {
   if (!data || typeof data !== 'object') {
     throw new Error('Invalid data provided to writeGlobalConfig');
@@ -61,7 +68,6 @@ export function writeGlobalConfig(data) {
   const mergedData = { ...existingData, ...data };
   
   try {
-    ensureGlobalConfigDir();
     const configPath = getGlobalConfigPath();
     const tempPath = `${configPath}.tmp`;
     fs.writeFileSync(tempPath, JSON.stringify(mergedData, null, 2), 'utf8');
@@ -74,14 +80,6 @@ export function writeGlobalConfig(data) {
     fs.renameSync(tempPath, configPath);
   } catch (error) {
     throw new Error(`Failed to write ${getGlobalConfigFilename()} file: ${error.message}`);
-  }
-}
-
-export function ensureGlobalConfigDir() {
-  const configPath = getGlobalConfigPath();
-  const configDir = path.dirname(configPath);
-  if (!fs.existsSync(configDir)) {
-    fs.mkdirSync(configDir, { recursive: true, mode: 0o700 });
   }
 }
 
@@ -100,4 +98,27 @@ export function saveGlobalApiKey(apiKey) {
   }
   
   writeGlobalConfig({ apiKey });
+}
+
+/**
+ * Ensures the global config file exists and is properly initialized
+ * Creates required fields like deviceID if they don't exist
+ * 
+ * @returns {Object} The initialized global config
+ * @throws {Error} If unable to read/write global config
+ */
+export function ensureGlobalConfig() {
+  let config = readGlobalConfig() || {};
+  let modified = false;
+  
+  if (!config.deviceID) {
+    config.deviceID = randomUUID();
+    modified = true;
+  }
+  
+  if (modified) {
+    writeGlobalConfig(config);
+  }
+  
+  return config;
 }

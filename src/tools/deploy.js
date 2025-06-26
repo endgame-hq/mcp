@@ -1,4 +1,5 @@
-import { deployApp, validateDotFileExists, validateApiKey } from '../sdk.js';
+import { deployApp, validateApiKey } from '../sdk.js';
+import { validateDotFileExists } from '../utils/local-config.js';
 import { getEnvFileAndBranch } from '../utils/fs.js';
 
 /**

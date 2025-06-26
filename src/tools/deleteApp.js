@@ -1,4 +1,5 @@
-import { deleteApp, validateDotFileExists, validateApiKey } from '../sdk.js';
+import { deleteApp, validateApiKey } from '../sdk.js';
+import { validateDotFileExists } from '../utils/local-config.js';
 
 /**
  * Deletes an app and all its related data (branches, versions, deployments, analytics).

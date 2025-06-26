@@ -7,8 +7,10 @@ import { validateTool } from './tools/validate.js';
 import { appsTool } from './tools/apps.js';
 import { deleteAppTool } from './tools/deleteApp.js';
 import { authenticateTool } from './tools/authenticate.js';
-
-import { initializeHostDetection, getMCPHost } from './utils/mcp-host-detector.js';
+import { getMCPHost } from './utils/mcp-host-detector.js';
+import { ensureGlobalConfig } from './utils/global-config.js';
+import { sendEventToMixpanel } from './utils/mixpanel.js';
+import { withUniversalWrapper } from './utils/tool-wrapper.js';
 
 export function createServer() {
   const server = new McpServer({
@@ -60,7 +62,7 @@ export function createServer() {
           'Frameworks used in the app (e.g., express, bun, nextjs, remix, sveltekit, react).'
         ),
     },
-    reviewTool
+    withUniversalWrapper('review', reviewTool)
   );
 
   /**
@@ -156,7 +158,7 @@ export function createServer() {
       .optional()
       .describe('Optional but recommended: enables Endgame to automatically test the app post-deployment. Currently supports testing a single path via either "server" or "webapp" mode. "server" type inspects HTTP requests to test API endpoints. "Webapp" type loads the frontend and inspects it alongside the HTTP request. Choose the testing type based on what best reflects the latest change—ideally the root path or an unauthenticated path affected by recent updates.')
     },
-    deployTool
+    withUniversalWrapper('deploy', deployTool)
   );
 
   /**
@@ -178,34 +180,8 @@ export function createServer() {
           'Absolute path to the root of the app source code directory for resolving organization context.'
         ),
     },
-    validateTool
+    withUniversalWrapper('validate', validateTool)
   );
-
-  /**
-   *
-   * Tool: Rollback
-   *
-   */
-  //   server.tool(
-  //     'rollback',
-  //     'Rollback a branch to a previous version (by versionId and branch)',
-  //     {
-  //       versionId: z.string().describe('Version ID to rollback to (required)'),
-  //       gitBranch: z.string().describe('Branch to rollback (required)'),
-  //     },
-  //     async params => rollbackTool(params)
-  //   );
-
-  /**
-   *
-   * Tool: Usage
-   *
-   */
-  //   server.tool('usage', 'Fetch usage analytics', undefined, async params =>
-  //     usageTool(params)
-  //   );
-
-
 
   /**
    *
@@ -222,7 +198,7 @@ export function createServer() {
           `Absolute path to the root of an app's source code directory. If this isn't submitted, it will default to listing app's from the user's personal organization.`
         ),
     },
-    appsTool
+    withUniversalWrapper('list-apps', appsTool)
   );
 
   /**
@@ -241,7 +217,7 @@ export function createServer() {
           `Absolute path to the root of an app's source code directory for resolving organization context.`
         ),
     },
-    deleteAppTool
+    withUniversalWrapper('delete-app', deleteAppTool)
   );
 
   /**
@@ -253,41 +229,23 @@ export function createServer() {
     'authenticate',
             'Authenticate with Endgame to obtain and save an API key. This opens the dashboard in your browser for OAuth authentication and automatically saves the API key to the global config file for future use.',
     {},
-    authenticateTool
+    withUniversalWrapper('authenticate', authenticateTool)
   );
-
-
-
-  /**
-   *
-   * Tool: Versions
-   *
-   */
-  //   server.tool(
-  //     'versions',
-  //     'List all versions for an app, grouped by branch (max 20 per branch). App name is resolved from dotfile.',
-  //     undefined,
-  //     async params => versionsTool(params)
-  //   );
-
-  /**
-   *
-   * Tool: Deployments
-   *
-   */
-  //   server.tool(
-  //     'deployments',
-  //     'List all deployments grouped by app.',
-  //     undefined,
-  //     async params => deploymentsTool(params)
-  //   );
 
   return server;
 }
 
 export async function runServerWithStdio() {
-  // Initialize host detection at startup
-  const hostType = initializeHostDetection();
+  try {
+    ensureGlobalConfig();
+    await sendEventToMixpanel({
+      event: 'mcp.server.started',
+      properties: {}
+    });
+  } catch (error) {
+    // Don't let analytics errors prevent server startup
+    console.error('Failed to initialize analytics:', error.message);
+  }
 
   const server = createServer();
   const transport = new StdioServerTransport();

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { ERRORS } from './errors.js';
 
 // Global configuration
 export const DOTFILE_NAME = '.endgame';
@@ -13,7 +14,7 @@ export const DEFAULT_ORG = 'personal';
  * @param {string} params.appSourcePath - Directory path to look for the .endgame file
  * @returns {object|null} Parsed JSON data or null if file doesn't exist
  */
-export const readDotFile = ({ appSourcePath }) => {
+export const readLocalConfig = ({ appSourcePath }) => {
   const dotFilePath = path.join(appSourcePath, DOTFILE_NAME);
 
   try {
@@ -49,7 +50,7 @@ export const readDotFile = ({ appSourcePath }) => {
  * @param {string} params.appSourcePath - Directory path to write the .endgame file
  * @param {object} params.data - Data to write to the file
  */
-export const writeDotFile = ({ appSourcePath, data }) => {
+export const writeLocalConfig = ({ appSourcePath, data }) => {
   const dotFilePath = path.join(appSourcePath, DOTFILE_NAME);
 
   /**
@@ -61,7 +62,7 @@ export const writeDotFile = ({ appSourcePath, data }) => {
   };
 
   // Read existing dotfile data first
-  const existingData = readDotFile({ appSourcePath }) || {};
+  const existingData = readLocalConfig({ appSourcePath }) || {};
 
   // Merge in the following order: defaults -> existing data -> new data
   const endgameData = {
@@ -86,7 +87,7 @@ export const writeDotFile = ({ appSourcePath, data }) => {
  * @param {string} params.appName - Application name to set in the dotfile
  * @returns {Promise<object>} Setup result with success status and dotfile data
  */
-export async function ensureDotFile({ appSourcePath, appName }) {
+export async function createLocalConfig({ appSourcePath, appName }) {
   if (!appName) {
     throw new Error('appName is required for setup');
   }
@@ -100,7 +101,7 @@ export async function ensureDotFile({ appSourcePath, appName }) {
   }
 
   // Read existing dotfile data
-  const existingData = readDotFile({ appSourcePath }) || {};
+  const existingData = readLocalConfig({ appSourcePath }) || {};
 
   // Check if app name conflicts with existing
   if (existingData.app && existingData.app !== appName) {
@@ -111,19 +112,13 @@ export async function ensureDotFile({ appSourcePath, appName }) {
 
   // Essential details to write
   const essentialData = {
-    org: 'personal',
     app: appName,
-    settings: {},
   };
 
   // Write/update the dotfile
-  writeDotFile({ appSourcePath, data: essentialData });
+  writeLocalConfig({ appSourcePath, data: essentialData });
 
-  return {
-    success: true,
-    message: `Successfully set up project with app name: ${appName}`,
-    dotfileData: { ...existingData, ...essentialData },
-  };
+  return essentialData;
 }
 
 /**
@@ -136,7 +131,7 @@ export async function ensureDotFile({ appSourcePath, appName }) {
  */
 export async function resolveAppName({ appSourcePath }) {
   // Read existing dotfile data
-  const dotfileData = readDotFile({ appSourcePath }) || {};
+  const dotfileData = readLocalConfig({ appSourcePath }) || {};
 
   // Throw error if dotfile is not found
   if (!dotfileData) {
@@ -164,7 +159,7 @@ export async function resolveAppName({ appSourcePath }) {
  * @throws {Error} If dotfile doesn't exist or is invalid
  */
 export const validateDotFileExists = ({ appSourcePath }) => {
-  const dotfileData = readDotFile({ appSourcePath });
+  const dotfileData = readLocalConfig({ appSourcePath });
   
   if (!dotfileData) {
     throw new Error(
@@ -176,6 +171,34 @@ export const validateDotFileExists = ({ appSourcePath }) => {
     throw new Error(
       'No "app" property found in ".endgame" file. Please call the "review-app" tool with an "appName" parameter to set up your app for deployment.'
     );
+  }
+  
+  return dotfileData;
+};
+
+/**
+ * Validates that the .endgame file exists and has required properties.
+ * Fetches and returns the local config file contents.
+ * 
+ * @param {object} params - The parameters object
+ * @param {string} params.appSourcePath - Directory path to look for the .endgame file
+ * @returns {object} The local config data from the .endgame file
+ * @throws {Error} If dotfile doesn't exist or lacks required app property
+ */
+export const validateAndGetLocalConfig = ({ appSourcePath }) => {
+  const dotfileData = readLocalConfig({ appSourcePath });
+  
+  if (!dotfileData) {
+    throw new Error(ERRORS.MISSING_LOCAL_ENDGAME_FILE);
+  }
+  
+  if (!dotfileData.app) {
+    throw new Error(ERRORS.MISSING_LOCAL_ENDGAME_FILE_APP_PROPERTY);
+  }
+
+  // If no "org" property, set it to the default org
+  if (!dotfileData.org) {
+    dotfileData.org = DEFAULT_ORG;
   }
   
   return dotfileData;

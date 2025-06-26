@@ -1,4 +1,5 @@
-import { listApps, validateDotFileExists, validateApiKey } from '../sdk.js';
+import { listApps, validateApiKey } from '../sdk.js';
+import { validateDotFileExists } from '../utils/local-config.js';
 
 /**
  * List all branches grouped by app name for the authenticated organization.
