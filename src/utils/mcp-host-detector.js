@@ -11,9 +11,13 @@ export function detectMCPHost() {
   try {
     if (process.ppid) {
       // Get both the command name and full command line
-      const parentComm = execSync(`ps -p ${process.ppid} -o comm=`, { encoding: 'utf8' }).trim();
-      const parentCmd = execSync(`ps -p ${process.ppid} -o args=`, { encoding: 'utf8' }).trim();
-      
+      const parentComm = execSync(`ps -p ${process.ppid} -o comm=`, {
+        encoding: 'utf8',
+      }).trim();
+      const parentCmd = execSync(`ps -p ${process.ppid} -o args=`, {
+        encoding: 'utf8',
+      }).trim();
+
       const parentLower = (parentComm + ' ' + parentCmd).toLowerCase();
       if (parentLower.includes('cursor')) {
         return 'cursor';
@@ -24,9 +28,12 @@ export function detectMCPHost() {
   } catch (error) {
     // Silently continue to other detection methods
   }
-  
+
   // Check for Cursor environment variables
-  if (process.env.CURSOR_TRACE_ID || Object.keys(process.env).some(key => key.includes('CURSOR'))) {
+  if (
+    process.env.CURSOR_TRACE_ID ||
+    Object.keys(process.env).some(key => key.includes('CURSOR'))
+  ) {
     return 'cursor';
   }
 
@@ -36,9 +43,13 @@ export function detectMCPHost() {
   }
 
   // Check for test environment
-  if (process.env.NODE_ENV === 'test' || process.argv.some(arg => 
-    arg.includes('test') || arg.includes('jest') || arg.includes('mocha')
-  )) {
+  if (
+    process.env.NODE_ENV === 'test' ||
+    process.argv.some(
+      arg =>
+        arg.includes('test') || arg.includes('jest') || arg.includes('mocha')
+    )
+  ) {
     return 'test';
   }
 
@@ -111,4 +122,4 @@ export function logMCPHostDetection() {
 export function isCursorMCPHost() {
   const detection = detectMCPHost();
   return detection === 'cursor';
-}  
+}

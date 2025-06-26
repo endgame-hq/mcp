@@ -9,7 +9,7 @@ console.log('Detected host:', detectedHost);
 
 await sendEventToMixpanel({
   event: 'test.host.event',
-  properties: { test: true }
+  properties: { test: true },
 });
 
 console.log('Event sent with host information');

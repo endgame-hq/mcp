@@ -1,5 +1,6 @@
-import { deployApp, validateApiKey } from '../sdk.js';
-import { validateDotFileExists } from '../utils/local-config.js';
+import { getAccount, deployApp } from '../sdk.js';
+import { findOrgByName } from '../utils/organization.js';
+import { validateAndGetLocalConfig } from '../utils/local-config.js';
 import { getEnvFileAndBranch } from '../utils/fs.js';
 
 /**
@@ -18,21 +19,26 @@ import { getEnvFileAndBranch } from '../utils/fs.js';
  * @param {object} [params.testing] - Optional testing configuration with path and optional test scenarios
  * @returns {Promise<object>} MCP formatted response
  */
-export async function deployTool(params) {
-  // Validate API key before proceeding
-  await validateApiKey();
+export async function deployTool({
+  appSourcePath,
+  gitBranch,
+  buildCommand,
+  buildArtifactPath,
+  entrypointFile,
+  deploymentDescription,
+  testing,
+}) {
+  // Validate local config
+  const localConfig = validateAndGetLocalConfig({ appSourcePath });
 
-  // Validate that dotfile exists before proceeding
-  validateDotFileExists({ appSourcePath: params.appSourcePath });
+  // Get account data
+  const accountData = await getAccount();
 
-  let {
-    appSourcePath,
-    buildCommand,
-    buildArtifactPath,
-    deploymentDescription: description,
-    gitBranch: explicitBranch,
-    testing,
-  } = params;
+  // Find org by name
+  const currentOrg = findOrgByName(
+    accountData?.organizations,
+    localConfig?.org
+  );
 
   // If the appSourcePath is the same as the buildArtifactPath, set buildArtifactPath to '.'
   if (appSourcePath === buildArtifactPath) {
@@ -42,29 +48,21 @@ export async function deployTool(params) {
   // Determine environment file and branch using utility functions
   const { envFilePath, branch } = await getEnvFileAndBranch(
     appSourcePath,
-    explicitBranch
+    gitBranch
   );
 
-
-
-  // Deploy using SDK (SDK handles all zipping, upload, and deployment)
-  const buildRequestStart = Date.now();
-  const buildRequestTime = new Date(buildRequestStart).toISOString();
-
-
   const buildResult = await deployApp({
+    orgId: currentOrg.id,
+    appName: localConfig.app,
     appSourcePath,
     envFilePath,
     buildCommand,
     buildArtifactPath,
     branch,
-    description,
-    entrypoint: params.entrypointFile,
+    description: deploymentDescription,
+    entrypoint: entrypointFile,
     testing,
   });
-
-  const buildRequestEnd = Date.now();
-  const buildRequestElapsed = buildRequestEnd - buildRequestStart;
 
   return {
     content: [

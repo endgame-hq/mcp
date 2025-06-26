@@ -1,29 +1,16 @@
 // Helper for authenticated requests to the Management API
 import { createTempZip } from './utils/zip.js';
 import { log } from './utils/logger.js';
-import { readLocalConfig, writeLocalConfig, ensureDotFile, DEFAULT_ORG, resolveAppName, validateDotFileExists } from './utils/local-config.js';
+import {
+  readLocalConfig,
+  writeLocalConfig,
+  DEFAULT_ORG,
+  resolveAppName,
+} from './utils/local-config.js';
 import { findOrgByName } from './utils/organization.js';
 import { uploadZipFile } from './utils/upload.js';
-import { getGlobalApiKey, saveGlobalApiKey, ensureGlobalConfig } from './utils/global-config.js';
-import { startDashboardAuthFlow } from './utils/oauth-flow.js';
-
-// SDK functions should not re-export utility functions - import directly from utils instead
-
-/**
- * Get the API key from the environment variable or global config.
- * If the API key is not found, return null
- * 
- * @returns {Promise<string|null>} The API key or null if not found
- */
-export async function getApiKey() {
-  let apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
-    apiKey = getGlobalApiKey();
-  }
-
-  return apiKey;
-}
+import { getGlobalConfig } from './utils/global-config.js';
+import { ERRORS } from './utils/errors.js';
 
 /**
  * Makes authenticated requests to the Management API.
@@ -33,16 +20,18 @@ export async function getApiKey() {
  * @param {object} [options={}] - Fetch options (method, headers, body, etc.)
  * @returns {Promise<Response>} Fetch response object
  */
-export async function fetchManagementApi(path, options = {}) {
-  let apiKey = process.env.API_KEY;
-  
+export async function fetchManagementApi({ path, options = {} }) {
+  // Getch API Key
+  let apiKey = process.env.API_KEY || null;
   if (!apiKey) {
-    apiKey = getGlobalApiKey();
+    // Get global config
+    const globalConfig = getGlobalConfig();
+    apiKey = globalConfig?.apiKey;
   }
-  
   if (!apiKey) {
-    throw new Error('API_KEY not found. Please run a tool to trigger authentication.');
+    throw new Error(ERRORS.MISSING_API_KEY);
   }
+
   const baseUrl = process.env.MANAGEMENT_API_URL || 'https://api.endgame.dev';
   const url = baseUrl + path;
 
@@ -64,6 +53,7 @@ export async function fetchManagementApi(path, options = {}) {
     .clone()
     .json()
     .catch(() => null);
+
   log('sdk.responded', {
     status: response.status,
     statusText: response.statusText,
@@ -74,77 +64,13 @@ export async function fetchManagementApi(path, options = {}) {
 }
 
 /**
- * Consolidates all user, config, and account data resolution into a single function.
- * This aggregates global config, local config, API key validation, and account data fetching.
- * Should be called before any API operation that requires user or org info.
- *
- * @param {object} params - The parameters object
- * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
- * @returns {Promise<object>} Object with globalConfig, localConfig, apiKey, user, organizations, and currentOrg
- */
-export async function resolveUserData({ appSourcePath }) {
-  // Ensure global config exists and get it
-  const globalConfig = ensureGlobalConfig();
-  
-  // Get API key from global config
-  const apiKey = globalConfig.apiKey;
-  if (!apiKey) {
-    throw new Error('No API key found. Please authenticate first.');
-  }
-
-  // Get local config and resolve org name
-  let localConfig = null;
-  let resolvedOrgName = DEFAULT_ORG;
-  
-  if (appSourcePath) {
-    // Read existing dotfile data
-    localConfig = readLocalConfig({ appSourcePath }) || {};
-
-    // Use org name from dotfile or always default to "DEFAULT_ORG"
-    resolvedOrgName = localConfig.org || DEFAULT_ORG;
-    if (!localConfig.org) {
-      localConfig = { ...localConfig, org: resolvedOrgName };
-      writeLocalConfig({ appSourcePath, data: { org: resolvedOrgName } });
-    }
-  }
-
-  // Get account info to find the actual org
-  const accountData = await getAccount();
-
-  // Find the org by name to get the full org object
-  const currentOrg = findOrgByName(accountData.organizations, resolvedOrgName);
-
-  return {
-    globalConfig,
-    localConfig,
-    apiKey,
-    user: accountData.user,
-    organizations: accountData.organizations,
-    currentOrg,
-  };
-}
-
-/**
- * Legacy function for backward compatibility - use resolveUserData instead
- * @deprecated Use resolveUserData for comprehensive user data resolution
- */
-export async function resolveAccountData({ appSourcePath }) {
-  const userData = await resolveUserData({ appSourcePath });
-  return {
-    user: userData.user,
-    organizations: userData.organizations,
-    currentOrg: userData.currentOrg,
-  };
-}
-
-/**
  * Gets account information including all organizations the user is a member of.
  * This is called before other API operations to resolve organization IDs.
  *
  * @returns {Promise<object>} Account data with user info and organizations array
  */
 export async function getAccount() {
-  const response = await fetchManagementApi('/account');
+  const response = await fetchManagementApi({ path: '/account' });
 
   if (!response.ok) {
     throw new Error(
@@ -168,13 +94,10 @@ export async function getAccount() {
  * @param {object} [params.accountData] - Pre-resolved account data to avoid duplicate API calls
  * @returns {Promise<object>} Object containing the presigned URL
  */
-export async function getPresignedUrl({ zipFilename, appSourcePath, accountData }) {
-  // Use provided account data or resolve it if not available
-  const { currentOrg } = accountData || await resolveAccountData({ appSourcePath });
+export async function getPresignedUrl({ orgId, zipFilename }) {
+  const presignPath = `/orgs/${orgId}/presign-s3-url?filename=${encodeURIComponent(zipFilename)}`;
 
-  const presignPath = `/orgs/${currentOrg.id}/presign-s3-url?filename=${encodeURIComponent(zipFilename)}`;
-
-  const response = await fetchManagementApi(presignPath);
+  const response = await fetchManagementApi({ path: presignPath });
   if (!response.ok) {
     throw new Error(
       `Failed to get presigned url: ${response.status} ${response.statusText}`
@@ -186,11 +109,74 @@ export async function getPresignedUrl({ zipFilename, appSourcePath, accountData 
 }
 
 /**
+ * Gets examples and build instructions for application development.
+ * Returns framework-specific examples and deployment guidance.
+ * Automatically resolves org name and ID from dotfile if not provided.
+ *
+ * @param {object} params - The parameters object
+ * @param {string} [params.runtime] - Runtime environment (e.g., 'nodejs22.x')
+ * @param {string} [params.language] - Programming language (e.g., 'javascript', 'typescript')
+ * @param {string} [params.packageManager] - Package manager (e.g., 'npm', 'yarn', 'pnpm')
+ * @param {string[]|string} [params.frameworks] - Frameworks used (e.g., ['express', 'nextjs'])
+ * @param {string} [params.appName] - App name (optional, will be resolved from dotfile if not provided)
+ * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
+ * @returns {Promise<object>} Examples and build instructions
+ */
+export async function review({
+  orgId,
+  runtime,
+  language,
+  packageManager,
+  frameworks,
+}) {
+  // Prepare request body with all parameters
+  const requestBody = {};
+
+  if (runtime) {
+    requestBody.runtime = runtime;
+  }
+
+  if (language) {
+    requestBody.language = language;
+  }
+
+  if (packageManager) {
+    requestBody.packageManager = packageManager;
+  }
+
+  if (frameworks) {
+    requestBody.frameworks = frameworks;
+  }
+
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/review`,
+    options: {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch examples: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const responseJson = await response.json();
+  return responseJson;
+}
+
+/**
  * Deploys an application by zipping the source code, uploading, and triggering a build.
  * Handles the complete deployment workflow including directory zipping, presigned URL generation,
  * file upload, and build initiation. Automatically resolves app and org names from dotfile.
  *
  * @param {object} params - The parameters object
+ * @param {string} params.orgId - Organization ID
+ * @param {string} params.appName - App name
  * @param {string} params.appSourcePath - Directory path for resolving app/org from dotfile (also the source directory to zip)
  * @param {string} [params.envFilePath] - Path to environment file to inject as .env
  * @param {string} [params.buildCommand] - Build command to execute
@@ -199,10 +185,11 @@ export async function getPresignedUrl({ zipFilename, appSourcePath, accountData 
  * @param {string} [params.description] - Deployment description
  * @param {string} [params.entrypoint] - Application entrypoint file
  * @param {object} [params.testing] - Optional testing configuration with required path and optional test scenarios
- * @param {object} [params.accountData] - Pre-resolved account data to avoid duplicate API calls
  * @returns {Promise<object>} Deployment result
  */
 export async function deployApp({
+  orgId,
+  appName,
   appSourcePath,
   envFilePath,
   buildCommand,
@@ -211,20 +198,14 @@ export async function deployApp({
   description,
   entrypoint,
   testing,
-  accountData,
 }) {
-  // Resolve app name and account from dotfile
-  const resolvedAppName = await resolveAppName({ appSourcePath });
-  const { currentOrg } = accountData || await resolveAccountData({ appSourcePath });
-
   // Generate zipFilename for the deployment
   const zipFilename = `deploy-${Date.now()}.zip`;
 
   // Get presigned URL (pass account data to avoid duplicate calls)
   const { url: presignedUrl } = await getPresignedUrl({
+    orgId,
     zipFilename,
-    appSourcePath,
-         accountData: { currentOrg },
   });
 
   // Create zip file from source directory using temp directory
@@ -235,7 +216,7 @@ export async function deployApp({
   const { zipPath: tmpZipPath, cleanup } = await createTempZip(
     appSourcePath,
     additionalFiles,
-    `${resolvedAppName}-`
+    `${appName}-`
   );
 
   try {
@@ -245,7 +226,7 @@ export async function deployApp({
     // Prepare build parameters
     const buildParams = {
       s3Url: presignedUrl.split('?')[0],
-      name: resolvedAppName,
+      name: appName,
       buildCommand,
       buildArtifactPath,
       branch,
@@ -261,12 +242,15 @@ export async function deployApp({
     }
 
     // Call build endpoint
-    const response = await fetchManagementApi(`/orgs/${currentOrg.id}/deploy`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetchManagementApi({
+      path: `/orgs/${orgId}/deploy`,
+      options: {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(buildParams),
       },
-      body: JSON.stringify(buildParams),
     });
 
     if (!response.ok) {
@@ -294,16 +278,15 @@ export async function deployApp({
  * Automatically resolves org name and ID from dotfile if not provided.
  *
  * @param {object} params - The parameters object
- * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
- * @param {object} [params.accountData] - Pre-resolved account data to avoid duplicate API calls
+ * @param {string} [params.orgId] - Organization ID
  * @returns {Promise<object>} List of applications
  */
-export async function listApps({ appSourcePath, accountData }) {
-  // Use provided account data or resolve it if not available
-  const { currentOrg } = accountData || await resolveAccountData({ appSourcePath });
-
-  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/apps`, {
-    method: 'GET',
+export async function listApps({ orgId }) {
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/apps`,
+    options: {
+      method: 'GET',
+    },
   });
 
   if (!response.ok) {
@@ -325,14 +308,10 @@ export async function listApps({ appSourcePath, accountData }) {
  * @param {object} [params._accountData] - Pre-resolved account data to avoid duplicate API calls
  * @returns {Promise<object>} List of application versions
  */
-export async function listVersions({ appSourcePath, _accountData }) {
-  // Resolve app name and account from dotfile
-  const appName = await resolveAppName({ appSourcePath });
-  const { currentOrg } = _accountData || await resolveAccountData({ appSourcePath });
-
-  const response = await fetchManagementApi(
-    `/orgs/${currentOrg.id}/versions?app=${encodeURIComponent(appName)}`
-  );
+export async function listVersions({ orgId, appName }) {
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/versions?app=${encodeURIComponent(appName)}`,
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -349,16 +328,13 @@ export async function listVersions({ appSourcePath, _accountData }) {
  * Automatically resolves org name and ID from dotfile.
  *
  * @param {object} params - The parameters object
- * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
+ * @param {string} [params.orgId] - Organization ID
  * @returns {Promise<object>} List of deployments
  */
-export async function listDeployments({ appSourcePath }) {
-  // Resolve account and get current org
-  const { currentOrg } = await resolveAccountData({ appSourcePath });
+export async function listDeployments({ orgId }) {
+  let url = `/orgs/${orgId}/deployments`;
 
-  let url = `/orgs/${currentOrg.id}/deployments`;
-
-  const response = await fetchManagementApi(url, { method: 'GET' });
+  const response = await fetchManagementApi({ path: url, method: 'GET' });
 
   if (!response.ok) {
     throw new Error(
@@ -380,20 +356,20 @@ export async function listDeployments({ appSourcePath }) {
  * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
  * @returns {Promise<object>} Rollback result
  */
-export async function rollbackApp({ versionId, branch, appSourcePath }) {
+export async function rollbackApp({ orgId, versionId, branch }) {
   if (!versionId || !branch) {
     throw new Error('versionId and branch are required');
   }
 
-  // Resolve account and get current org
-  const { currentOrg } = await resolveAccountData({ appSourcePath });
-
-  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/rollback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/rollback`,
+    options: {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ versionId, branch }),
     },
-    body: JSON.stringify({ versionId, branch }),
   });
 
   if (!response.ok) {
@@ -405,8 +381,6 @@ export async function rollbackApp({ versionId, branch, appSourcePath }) {
   return await response.json();
 }
 
-
-
 /**
  * Fetches usage analytics for the organization.
  * Returns analytics data including resource usage and metrics.
@@ -416,11 +390,10 @@ export async function rollbackApp({ versionId, branch, appSourcePath }) {
  * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
  * @returns {Promise<object>} Usage analytics data
  */
-export async function getUsageAnalytics({ appSourcePath }) {
-  // Resolve account and get current org
-  const { currentOrg } = await resolveAccountData({ appSourcePath });
-
-  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/analytics`);
+export async function getUsageAnalytics({ orgId }) {
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/analytics`,
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -429,66 +402,6 @@ export async function getUsageAnalytics({ appSourcePath }) {
   }
 
   return await response.json();
-}
-
-/**
- * Gets examples and build instructions for application development.
- * Returns framework-specific examples and deployment guidance.
- * Automatically resolves org name and ID from dotfile if not provided.
- *
- * @param {object} params - The parameters object
- * @param {string} [params.runtime] - Runtime environment (e.g., 'nodejs22.x')
- * @param {string} [params.language] - Programming language (e.g., 'javascript', 'typescript')
- * @param {string} [params.packageManager] - Package manager (e.g., 'npm', 'yarn', 'pnpm')
- * @param {string[]|string} [params.frameworks] - Frameworks used (e.g., ['express', 'nextjs'])
- * @param {string} [params.appName] - App name (optional, will be resolved from dotfile if not provided)
- * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
- * @returns {Promise<object>} Examples and build instructions
- */
-export async function review({
-  runtime,
-  language,
-  packageManager,
-  frameworks,
-  appName,
-  appSourcePath,
-}) {
-
-  // Prepare request body with all parameters
-  const requestBody = {};
-
-  if (runtime) {
-    requestBody.runtime = runtime;
-  }
-
-  if (language) {
-    requestBody.language = language;
-  }
-
-  if (packageManager) {
-    requestBody.packageManager = packageManager;
-  }
-
-  if (frameworks) {
-    requestBody.frameworks = frameworks;
-  }
-
-  const response = await fetchManagementApi(`/orgs/${currentOrg.id}/review`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch examples: ${response.status} ${response.statusText}`
-    );
-  }
-
-  const responseJson = await response.json();
-  return responseJson;
 }
 
 /**
@@ -502,20 +415,17 @@ export async function review({
  * @returns {Promise<object>} Deletion summary with counts of deleted records
  * @throws {Error} If app is not found or deletion fails
  */
-export async function deleteApp({ appName, appSourcePath }) {
+export async function deleteApp({ orgId, appName }) {
   if (!appName) {
     throw new Error('App name is required for deletion');
   }
 
-  // Resolve account and get current org
-  const { currentOrg } = await resolveAccountData({ appSourcePath });
-
-  const response = await fetchManagementApi(
-    `/orgs/${currentOrg.id}/apps/${appName}`,
-    {
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/apps/${appName}`,
+    options: {
       method: 'DELETE',
-    }
-  );
+    },
+  });
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -540,23 +450,17 @@ export async function deleteApp({ appName, appSourcePath }) {
  * @param {string} [params.appSourcePath] - Directory path for resolving org from dotfile
  * @returns {Promise<object>} Test results or error after timeout
  */
-export async function validate({
-  deploymentId,
-  appSourcePath,
-}) {
+export async function validate({ orgId, deploymentId }) {
   if (!deploymentId) {
     throw new Error('Deployment ID is required');
   }
 
-  // Resolve account and get current org
-  const { currentOrg } = await resolveAccountData({ appSourcePath });
-
-  const response = await fetchManagementApi(
-    `/orgs/${currentOrg.id}/deployments/${deploymentId}/test-results`,
-    {
+  const response = await fetchManagementApi({
+    path: `/orgs/${orgId}/deployments/${deploymentId}/test-results`,
+    options: {
       method: 'GET',
-    }
-  );
+    },
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -566,5 +470,3 @@ export async function validate({
 
   return await response.json();
 }
-
-

@@ -4,10 +4,9 @@ import { z } from 'zod';
 import { reviewTool } from './tools/review.js';
 import { deployTool } from './tools/deploy.js';
 import { validateTool } from './tools/validate.js';
-import { appsTool } from './tools/apps.js';
+import { listAppsTool } from './tools/listApps.js';
 import { deleteAppTool } from './tools/deleteApp.js';
 import { authenticateTool } from './tools/authenticate.js';
-import { getMCPHost } from './utils/mcp-host-detector.js';
 import { ensureGlobalConfig } from './utils/global-config.js';
 import { sendEventToMixpanel } from './utils/mixpanel.js';
 import { withUniversalWrapper } from './utils/tool-wrapper.js';
@@ -121,42 +120,70 @@ export function createServer() {
         .describe(
           'A description of the app use-case, followed by the changes made in this deployment. Ensure a minimum of 240 characters. Example: "This is a full-stack codebase for a SaaS solution that hosts bots for the Slack messaging platform. This deployment includes changes to the home page and a new feature that allows users to select from a variety of templates to create a new Slack bot from. The templates area available via API within new API routes."'
         ),
-      testing: z.object({
-        path: z.string()
-          .describe('Path to append to the app URL for testing (e.g., "/", "/login", "/dashboard", "/api/health")'),
-        type: z.enum(['webapp', 'server'])
-          .describe(
+      testing: z
+        .object({
+          path: z
+            .string()
+            .describe(
+              'Path to append to the app URL for testing (e.g., "/", "/login", "/dashboard", "/api/health")'
+            ),
+          type: z
+            .enum(['webapp', 'server'])
+            .describe(
               `Test type: "webapp" for server and browser-based testing with screenshots and CDP event analysis. "server" for HTTP endpoint testing with server logs analysis. "webapp" is recommended apps with front-ends and "server" is recommended for APIs.`
-          ),
-        method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])
-          .default('GET')
-          .optional()
-          .describe('HTTP method for server testing (default: GET). Only used for "server" type.'),
-        body: z.string()
-          .optional()
-          .describe('Request body for POST/PUT/PATCH requests. Should be a JSON string or raw body content. Only allowed for POST, PUT, and PATCH methods.'),
-        headers: z.record(z.string())
-          .optional()
-          .describe('Custom HTTP headers as key-value pairs. Content-Type will be auto-set to application/json if body is provided and Content-Type is not specified.'),
-      }).refine(data => {
-        // Validate configuration based on type
-        if (data.type === 'webapp') {
-          // Webapp type should not have method (other than GET), body, or headers
-          if ((data.method && data.method !== 'GET') || data.body || data.headers) {
-            return false;
+            ),
+          method: z
+            .enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])
+            .default('GET')
+            .optional()
+            .describe(
+              'HTTP method for server testing (default: GET). Only used for "server" type.'
+            ),
+          body: z
+            .string()
+            .optional()
+            .describe(
+              'Request body for POST/PUT/PATCH requests. Should be a JSON string or raw body content. Only allowed for POST, PUT, and PATCH methods.'
+            ),
+          headers: z
+            .record(z.string())
+            .optional()
+            .describe(
+              'Custom HTTP headers as key-value pairs. Content-Type will be auto-set to application/json if body is provided and Content-Type is not specified.'
+            ),
+        })
+        .refine(
+          data => {
+            // Validate configuration based on type
+            if (data.type === 'webapp') {
+              // Webapp type should not have method (other than GET), body, or headers
+              if (
+                (data.method && data.method !== 'GET') ||
+                data.body ||
+                data.headers
+              ) {
+                return false;
+              }
+            } else if (data.type === 'server') {
+              // Server type: validate body is only used with appropriate methods
+              if (
+                data.body &&
+                !['POST', 'PUT', 'PATCH'].includes(data.method || 'GET')
+              ) {
+                return false;
+              }
+            }
+            return true;
+          },
+          {
+            message:
+              'Invalid configuration for selected type: webapp type only supports path, server type supports method/body/headers',
           }
-        } else if (data.type === 'server') {
-          // Server type: validate body is only used with appropriate methods
-          if (data.body && !['POST', 'PUT', 'PATCH'].includes(data.method || 'GET')) {
-            return false;
-          }
-        }
-        return true;
-      }, {
-        message: 'Invalid configuration for selected type: webapp type only supports path, server type supports method/body/headers'
-      })
-      .optional()
-      .describe('Optional but recommended: enables Endgame to automatically test the app post-deployment. Currently supports testing a single path via either "server" or "webapp" mode. "server" type inspects HTTP requests to test API endpoints. "Webapp" type loads the frontend and inspects it alongside the HTTP request. Choose the testing type based on what best reflects the latest change—ideally the root path or an unauthenticated path affected by recent updates.')
+        )
+        .optional()
+        .describe(
+          'Optional but recommended: enables Endgame to automatically test the app post-deployment. Currently supports testing a single path via either "server" or "webapp" mode. "server" type inspects HTTP requests to test API endpoints. "Webapp" type loads the frontend and inspects it alongside the HTTP request. Choose the testing type based on what best reflects the latest change—ideally the root path or an unauthenticated path affected by recent updates.'
+        ),
     },
     withUniversalWrapper('deploy', deployTool)
   );
@@ -198,7 +225,7 @@ export function createServer() {
           `Absolute path to the root of an app's source code directory. If this isn't submitted, it will default to listing app's from the user's personal organization.`
         ),
     },
-    withUniversalWrapper('list-apps', appsTool)
+    withUniversalWrapper('list-apps', listAppsTool)
   );
 
   /**
@@ -227,7 +254,7 @@ export function createServer() {
    */
   server.tool(
     'authenticate',
-            'Authenticate with Endgame to obtain and save an API key. This opens the dashboard in your browser for OAuth authentication and automatically saves the API key to the global config file for future use.',
+    'Authenticate with Endgame to obtain and save an API key. This opens the dashboard in your browser for OAuth authentication and automatically saves the API key to the global config file for future use.',
     {},
     withUniversalWrapper('authenticate', authenticateTool)
   );
@@ -237,10 +264,12 @@ export function createServer() {
 
 export async function runServerWithStdio() {
   try {
+    // Ensure global config exists at startup
     ensureGlobalConfig();
+    // Send analytics event on server start
     await sendEventToMixpanel({
       event: 'mcp.server.started',
-      properties: {}
+      properties: {},
     });
   } catch (error) {
     // Don't let analytics errors prevent server startup
@@ -251,6 +280,3 @@ export async function runServerWithStdio() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
-
-// Export the host detection function for use throughout the server
-export { getMCPHost };

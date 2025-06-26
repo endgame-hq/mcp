@@ -10,7 +10,9 @@ ensureGlobalConfig();
 
 await sendEventToMixpanel({
   event: 'mcp.server.started',
-  properties: {}
+  properties: {},
 });
 
-console.log('Server startup event sent (host should be included automatically)');
+console.log(
+  'Server startup event sent (host should be included automatically)'
+);

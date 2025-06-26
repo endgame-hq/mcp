@@ -52,7 +52,7 @@ export async function cleanupTempZip(zipPath) {
 export async function zipDirectory(srcDir, outPath, additionalFiles = []) {
   const zipfile = new yazl.ZipFile();
   let outStream = null;
-  
+
   try {
     outStream = fs.createWriteStream(outPath);
     const endPromise = new Promise((resolve, reject) => {
@@ -135,15 +135,19 @@ export async function zipDirectory(srcDir, outPath, additionalFiles = []) {
  * @param {string} [prefix='app-'] - Prefix for the temporary zip file name
  * @returns {Promise<{zipPath: string, cleanup: Function}>} Object with zip path and cleanup function
  */
-export async function createTempZip(srcDir, additionalFiles = [], prefix = 'app-') {
+export async function createTempZip(
+  srcDir,
+  additionalFiles = [],
+  prefix = 'app-'
+) {
   const zipPath = await createTempZipPath(prefix);
-  
+
   try {
     await zipDirectory(srcDir, zipPath, additionalFiles);
-    
+
     return {
       zipPath,
-      cleanup: () => cleanupTempZip(zipPath)
+      cleanup: () => cleanupTempZip(zipPath),
     };
   } catch (error) {
     // Ensure cleanup even if zip creation fails

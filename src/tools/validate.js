@@ -1,29 +1,43 @@
-import { validate, validateApiKey } from '../sdk.js';
-import { validateDotFileExists } from '../utils/local-config.js';
+import { validate, getAccount } from '../sdk.js';
+import { findOrgByName } from '../utils/organization.js';
+import { validateAndGetLocalConfig } from '../utils/local-config.js';
 import { log } from '../utils/logger.js';
 
 /**
  * Tool: Validate
- * Validates deployment test results by polling for completion
- * API key validation is handled directly within this function.
+ * Validates deployment test results by polling for completion.
+ * API key validation is handled by the getAccount function.
+ *
+ * @param {object} params - Validation parameters
+ * @param {string} params.deploymentId - Deployment ID to validate
+ * @param {string} params.appSourcePath - Source directory path
+ * @returns {Promise<object>} MCP formatted response
  */
 export async function validateTool({ deploymentId, appSourcePath }) {
-  // Validate API key before proceeding
-  await validateApiKey();
+  // Validate local config
+  const localConfig = validateAndGetLocalConfig({ appSourcePath });
 
-  // Validate that dotfile exists before proceeding
-  validateDotFileExists({ appSourcePath });
-  
+  // Get account data
+  const accountData = await getAccount();
+
+  // Find org by name
+  const currentOrg = findOrgByName(
+    accountData?.organizations,
+    localConfig?.org
+  );
+
   log('validate.start', { deploymentId });
 
   try {
     const result = await validate({
+      orgId: currentOrg.id,
+      appName: localConfig.app,
       deploymentId,
       appSourcePath,
     });
 
     log('validate.success', { deploymentId, hasResults: !!result });
-    
+
     return {
       content: [
         {
@@ -34,7 +48,7 @@ export async function validateTool({ deploymentId, appSourcePath }) {
     };
   } catch (error) {
     log('validate.error', { deploymentId, error: error.message });
-    
+
     return {
       content: [
         {

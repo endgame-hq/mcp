@@ -20,5 +20,5 @@ export const ERRORS = {
    * Error message when .endgame file exists but lacks the required "app" property
    * Guides user to use review-app tool to properly configure the file
    */
-  MISSING_LOCAL_ENDGAME_FILE_APP_PROPERTY: `No "app" property found in ".endgame" file. Please call the "review-app" tool with an "appName" parameter to set up your app for deployment.`
+  MISSING_LOCAL_ENDGAME_FILE_APP_PROPERTY: `No "app" property found in ".endgame" file. Please call the "review-app" tool with an "appName" parameter to set up your app for deployment.`,
 };

@@ -13,7 +13,7 @@ let cachedVersion = null;
 
 /**
  * Gets the current MCP version
- * 
+ *
  * @returns {string} The MCP version or 'unknown' if not available
  */
 export const getMcpVersion = () => {
@@ -31,4 +31,4 @@ export const getMcpVersion = () => {
     cachedVersion = 'unknown';
     return cachedVersion;
   }
-}; 
+};

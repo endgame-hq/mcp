@@ -151,35 +151,9 @@ export async function resolveAppName({ appSourcePath }) {
 }
 
 /**
- * Validates that the .endgame dotfile exists in the specified directory.
- * Throws a standardized error if it doesn't exist, instructing to use the review tool.
- *
- * @param {object} params - The parameters object
- * @param {string} params.appSourcePath - Directory path to look for the .endgame file
- * @throws {Error} If dotfile doesn't exist or is invalid
- */
-export const validateDotFileExists = ({ appSourcePath }) => {
-  const dotfileData = readLocalConfig({ appSourcePath });
-  
-  if (!dotfileData) {
-    throw new Error(
-      'No ".endgame" file found in the root directory. Please call the "review-app" tool with an "appName" parameter and the ".endgame" file will be created for you and your app will be set up for deployment to Endgame. The app name must be lowercase, alphanumeric characters and dashes only, between 3-20 characters.'
-    );
-  }
-  
-  if (!dotfileData.app) {
-    throw new Error(
-      'No "app" property found in ".endgame" file. Please call the "review-app" tool with an "appName" parameter to set up your app for deployment.'
-    );
-  }
-  
-  return dotfileData;
-};
-
-/**
  * Validates that the .endgame file exists and has required properties.
  * Fetches and returns the local config file contents.
- * 
+ *
  * @param {object} params - The parameters object
  * @param {string} params.appSourcePath - Directory path to look for the .endgame file
  * @returns {object} The local config data from the .endgame file
@@ -187,11 +161,11 @@ export const validateDotFileExists = ({ appSourcePath }) => {
  */
 export const validateAndGetLocalConfig = ({ appSourcePath }) => {
   const dotfileData = readLocalConfig({ appSourcePath });
-  
+
   if (!dotfileData) {
     throw new Error(ERRORS.MISSING_LOCAL_ENDGAME_FILE);
   }
-  
+
   if (!dotfileData.app) {
     throw new Error(ERRORS.MISSING_LOCAL_ENDGAME_FILE_APP_PROPERTY);
   }
@@ -200,6 +174,6 @@ export const validateAndGetLocalConfig = ({ appSourcePath }) => {
   if (!dotfileData.org) {
     dotfileData.org = DEFAULT_ORG;
   }
-  
+
   return dotfileData;
-}; 
+};
