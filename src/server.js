@@ -296,24 +296,18 @@ export function createServer() {
    */
   server.tool(
     'merge-future-state',
-    'Downloads and merges the latest future-state branch deployment with your local code. The future-state branch contains AI-generated improvements. Creates backups of modified files.',
+    'Downloads and compares the latest future-state branch deployment with your local code. The future-state branch contains AI-generated improvements. Opens a visual diff in VS Code for review without making any changes to your files.',
     {
       appSourcePath: z
         .string()
         .describe(
           `Absolute path to the root of the app's source code directory.`
         ),
-      dryRun: z
-        .boolean()
-        .optional()
-        .describe(
-          'If true, shows what would be merged without making changes. Default is false.'
-        ),
       exclude: z
         .array(z.string())
         .optional()
         .describe(
-          'Additional file patterns to exclude from merge (e.g., ["*.config.js", "dist/*"])'
+          'Additional file patterns to exclude from comparison (e.g., ["*.config.js", "dist/*"])'
         ),
     },
     errorHandler(mergeFutureStateTool)
