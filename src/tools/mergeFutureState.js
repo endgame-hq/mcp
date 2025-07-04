@@ -61,16 +61,98 @@ async function downloadFromUrl(url, destPath) {
 }
 
 /**
+ * Check if VS Code CLI is available
+ * @returns {Promise<boolean>} Whether VS Code CLI is available
+ */
+async function isVSCodeInstalled() {
+  try {
+    const { execSync } = await import('child_process');
+    // Try to run code --version
+    execSync('code --version', { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Install the Endgame VS Code extension
+ * @returns {Promise<boolean>} Whether installation was successful
+ */
+async function installVSCodeExtension() {
+  try {
+    const { execSync } = await import('child_process');
+    const { fileURLToPath } = await import('url');
+    const { dirname } = await import('path');
+
+    // Get the directory of this file and navigate to the project root
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const projectRoot = path.resolve(__dirname, '..', '..', '..');
+
+    // Find the .vsix file in the vscode-extension directory
+    const extensionDir = path.join(projectRoot, 'vscode-extension');
+
+    if (!fs.existsSync(extensionDir)) {
+      console.error(
+        '[MERGE FUTURE-STATE] VS Code extension directory not found:',
+        extensionDir
+      );
+      return false;
+    }
+
+    const vsixFiles = fs
+      .readdirSync(extensionDir)
+      .filter(file => file.endsWith('.vsix'));
+
+    if (vsixFiles.length === 0) {
+      console.error(
+        '[MERGE FUTURE-STATE] No .vsix file found in vscode-extension directory'
+      );
+      return false;
+    }
+
+    // Use the first .vsix file found
+    const vsixPath = path.join(extensionDir, vsixFiles[0]);
+
+    console.error(
+      `[MERGE FUTURE-STATE] Installing VS Code extension from: ${vsixPath}`
+    );
+
+    // Install the extension
+    execSync(`cursor --install-extension "${vsixPath}"`, { stdio: 'inherit' });
+
+    console.error(
+      '[MERGE FUTURE-STATE] VS Code extension installed successfully'
+    );
+
+    // Give VS Code a moment to start the extension
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    return true;
+  } catch (error) {
+    console.error(
+      '[MERGE FUTURE-STATE] Failed to install VS Code extension:',
+      error.message
+    );
+    return false;
+  }
+}
+
+/**
  * Check if VS Code extension server is available
- * @returns {Promise<boolean>} Whether the server is available
+ * @returns {Promise<{available: boolean, workspaceId?: string}>} Whether the server is available and workspace info
  */
 async function isVSCodeExtensionAvailable() {
   try {
     const response = await fetch('http://localhost:3111/health');
     const data = await response.json();
-    return data.status === 'ok' && data.extension === 'endgame';
+    return {
+      available: data.status === 'ok' && data.extension === 'endgame',
+      workspaceId: data.workspaceId,
+    };
   } catch (error) {
-    return false;
+    return { available: false };
   }
 }
 
@@ -78,15 +160,17 @@ async function isVSCodeExtensionAvailable() {
  * Call VS Code extension command via HTTP
  * @param {string} command - The command to execute
  * @param {any[]} args - Arguments for the command
+ * @param {string} workspaceId - The workspace ID to target
  * @returns {Promise<any>} Command result
  */
-async function callVSCodeCommand(command, args = []) {
+async function callVSCodeCommand(command, args = [], workspaceId) {
   const response = await fetch('http://localhost:3111/command', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       command,
       args,
+      workspaceId,
     }),
   });
 
@@ -165,6 +249,44 @@ async function analyzeDirectories(srcDir, destDir, options = {}) {
 }
 
 /**
+ * Find the workspace ID that matches the given path
+ * @param {string} targetPath - The path to match against workspaces
+ * @returns {Promise<string|null>} The workspace ID or null if not found
+ */
+async function findWorkspaceForPath(targetPath) {
+  try {
+    const response = await fetch('http://localhost:3111/workspaces');
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    const workspaces = data.workspaces || [];
+
+    // Normalize the target path
+    const normalizedTarget = path.resolve(targetPath);
+
+    // Find workspace that matches or contains the target path
+    for (const workspace of workspaces) {
+      const normalizedWorkspace = path.resolve(workspace.workspacePath);
+
+      // Check for exact match or if target is within workspace
+      if (
+        normalizedTarget === normalizedWorkspace ||
+        normalizedTarget.startsWith(normalizedWorkspace + path.sep)
+      ) {
+        return workspace.workspaceId;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('[MERGE FUTURE-STATE] Error finding workspace:', error);
+    return null;
+  }
+}
+
+/**
  * Compare future-state branch changes with local code
  * @param {object} params - Tool parameters
  * @param {string} params.appSourcePath - Local app source directory
@@ -178,11 +300,49 @@ export async function mergeFutureStateTool(params) {
 
   try {
     // Check if VS Code extension is available
-    const vsCodeAvailable = await isVSCodeExtensionAvailable();
+    let vsCodeAvailable = await isVSCodeExtensionAvailable();
 
     console.error(
-      `[MERGE FUTURE-STATE] VS Code extension available: ${vsCodeAvailable}`
+      `[MERGE FUTURE-STATE] VS Code extension available: ${vsCodeAvailable.available}`
     );
+
+    // If extension is not available, try to install it
+    if (!vsCodeAvailable.available) {
+      const vsCodeInstalled = await isVSCodeInstalled();
+
+      if (vsCodeInstalled) {
+        console.error(
+          '[MERGE FUTURE-STATE] VS Code is installed but extension is not available'
+        );
+        console.error(
+          '[MERGE FUTURE-STATE] Attempting to install Endgame extension...'
+        );
+
+        const installSuccess = await installVSCodeExtension();
+
+        if (installSuccess) {
+          // Check again if the extension is now available
+          vsCodeAvailable = await isVSCodeExtensionAvailable();
+
+          if (vsCodeAvailable.available) {
+            console.error(
+              '[MERGE FUTURE-STATE] Extension installed and server is now available'
+            );
+          } else {
+            console.error(
+              '[MERGE FUTURE-STATE] Extension installed but server may need to be started manually'
+            );
+            console.error(
+              '[MERGE FUTURE-STATE] Try restarting VS Code or run "Endgame: Hello World" command in VS Code'
+            );
+          }
+        }
+      } else {
+        console.error(
+          '[MERGE FUTURE-STATE] VS Code is not installed on this system'
+        );
+      }
+    }
 
     // Resolve app name and account
     const appName = await resolveAppName({ appSourcePath });
@@ -345,15 +505,33 @@ export async function mergeFutureStateTool(params) {
 
       // If VS Code is available, show diff
       let diffResult = null;
-      if (vsCodeAvailable) {
+      if (vsCodeAvailable.available) {
         try {
-          console.error(`[MERGE FUTURE-STATE] Opening VS Code diff view`);
-          // Compare future-state (source) vs local (target) to show new files from future-state
-          const vscodeResult = await callVSCodeCommand(
-            'endgame.diffDirectory',
-            [extractDir, appSourcePath]
-          );
-          diffResult = vscodeResult.result;
+          // Find the workspace ID that matches the appSourcePath
+          const targetWorkspaceId = await findWorkspaceForPath(appSourcePath);
+
+          if (!targetWorkspaceId) {
+            console.error(
+              '[MERGE FUTURE-STATE] Could not find VS Code workspace for path:',
+              appSourcePath
+            );
+            console.error(
+              '[MERGE FUTURE-STATE] Make sure VS Code is open with the target directory'
+            );
+          } else {
+            console.error(
+              `[MERGE FUTURE-STATE] Found workspace ID: ${targetWorkspaceId}`
+            );
+            console.error(`[MERGE FUTURE-STATE] Opening VS Code diff view`);
+
+            // Compare future-state (source) vs local (target) to show new files from future-state
+            const vscodeResult = await callVSCodeCommand(
+              'endgame.diffDirectory',
+              [extractDir, appSourcePath],
+              targetWorkspaceId
+            );
+            diffResult = vscodeResult.result;
+          }
         } catch (error) {
           console.error(
             '[MERGE FUTURE-STATE] Failed to open VS Code diff:',
@@ -385,7 +563,11 @@ export async function mergeFutureStateTool(params) {
         response.comparison.vscodeComparison = diffResult.summary;
         response.comparison.note =
           'VS Code diff view has been opened to show the changes.';
-      } else if (!vsCodeAvailable) {
+      } else if (vsCodeAvailable.available) {
+        // VS Code is available but diff wasn't opened
+        response.comparison.note =
+          'VS Code extension is available but could not open diff. Make sure VS Code is open with the target directory.';
+      } else if (!vsCodeAvailable.available) {
         response.comparison.note =
           'VS Code extension not available. Install the Endgame VS Code extension to see a visual diff.';
       }
