@@ -2,6 +2,7 @@ import { validate, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
 import { log } from '../utils/logger.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Tool: Validate
@@ -14,6 +15,9 @@ import { log } from '../utils/logger.js';
  * @returns {Promise<object>} MCP formatted response
  */
 export async function validateTool({ deploymentId, appSourcePath }) {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   // Validate local config
   const localConfig = validateAndGetLocalConfig({ appSourcePath });
 
@@ -38,11 +42,33 @@ export async function validateTool({ deploymentId, appSourcePath }) {
 
     log('validate.success', { deploymentId, hasResults: !!result });
 
+    // Track successful validation
+    const duration = Date.now() - startTime;
+    await sendEventToMixpanel({
+      event: 'tool.succeeded',
+      properties: {
+        tool_name: 'validate',
+        duration_ms: duration,
+      },
+      userId: accountData.id,
+    });
+
+    // Filter out screenshot from the result
+    const filteredResult = { ...result };
+    if (filteredResult.screenshot) {
+      delete filteredResult.screenshot;
+    }
+    // Also check for nested screenshots in case structure is different
+    if (filteredResult.data?.screenshot) {
+      filteredResult.data = { ...filteredResult.data };
+      delete filteredResult.data.screenshot;
+    }
+
     return {
       content: [
         {
           type: 'text',
-          text: JSON.stringify(result),
+          text: JSON.stringify(filteredResult),
         },
       ],
     };

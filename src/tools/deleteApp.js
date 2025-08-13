@@ -1,6 +1,7 @@
 import { deleteApp, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Deletes an app and all its related data (branches, versions, deployments, analytics).
@@ -17,6 +18,9 @@ export async function deleteAppTool({
   appName,
   appSourcePath,
 }) {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   // Validate local config
   const localConfig = validateAndGetLocalConfig({ appSourcePath });
 
@@ -38,6 +42,17 @@ export async function deleteAppTool({
     orgId: currentOrg.id,
     appName, 
     appSourcePath 
+  });
+
+  // Track successful deletion
+  const duration = Date.now() - startTime;
+  await sendEventToMixpanel({
+    event: 'tool.succeeded',
+    properties: {
+      tool_name: 'deleteApp',
+      duration_ms: duration,
+    },
+    userId: accountData.id,
   });
 
   return {

@@ -1,6 +1,7 @@
 import { listVersions, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Lists all versions for a specific application, grouped by branch.
@@ -13,6 +14,9 @@ import { validateAndGetLocalConfig } from '../utils/local-config.js';
  * @returns {Promise<object>} A promise resolving to an object with a content property
  */
 export const versionsTool = async ({ appSourcePath }) => {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   try {
     // Validate local config
     const localConfig = validateAndGetLocalConfig({ appSourcePath });
@@ -31,6 +35,17 @@ export const versionsTool = async ({ appSourcePath }) => {
       orgId: currentOrg.id,
       appName: localConfig.app,
       appSourcePath,
+    });
+
+    // Track successful versions fetch
+    const duration = Date.now() - startTime;
+    await sendEventToMixpanel({
+      event: 'tool.succeeded',
+      properties: {
+        tool_name: 'versions',
+        duration_ms: duration,
+      },
+      userId: accountData.id,
     });
 
     return {

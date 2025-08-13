@@ -1,6 +1,7 @@
 import { getUsageAnalytics, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Usage tool for fetching organization analytics from the management API.
@@ -12,6 +13,9 @@ import { validateAndGetLocalConfig } from '../utils/local-config.js';
  * @returns {Promise<object>} Usage analytics for the organization
  */
 export async function usageTool({ appSourcePath }) {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   try {
     // Validate local config
     const localConfig = validateAndGetLocalConfig({ appSourcePath });
@@ -30,6 +34,17 @@ export async function usageTool({ appSourcePath }) {
       orgId: currentOrg.id,
       orgName: currentOrg.name,
       appSourcePath 
+    });
+
+    // Track successful usage fetch
+    const duration = Date.now() - startTime;
+    await sendEventToMixpanel({
+      event: 'tool.succeeded',
+      properties: {
+        tool_name: 'usage',
+        duration_ms: duration,
+      },
+      userId: accountData.id,
     });
 
     return {

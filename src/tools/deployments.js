@@ -1,6 +1,7 @@
 import { listDeployments, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Lists all deployments for the organization.
@@ -12,6 +13,9 @@ import { validateAndGetLocalConfig } from '../utils/local-config.js';
  * @returns {Promise<object>} A promise resolving to an object with a content property
  */
 export async function deploymentsTool({ appSourcePath }) {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   try {
     // Validate local config
     const localConfig = validateAndGetLocalConfig({ appSourcePath });
@@ -29,6 +33,17 @@ export async function deploymentsTool({ appSourcePath }) {
     const data = await listDeployments({
       orgId: currentOrg.id,
       appSourcePath,
+    });
+
+    // Track successful deployments fetch
+    const duration = Date.now() - startTime;
+    await sendEventToMixpanel({
+      event: 'tool.succeeded',
+      properties: {
+        tool_name: 'deployments',
+        duration_ms: duration,
+      },
+      userId: accountData.id,
     });
 
     return {

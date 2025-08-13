@@ -1,6 +1,7 @@
 import { listApps, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * List all branches grouped by app name for the authenticated organization.
@@ -12,6 +13,9 @@ import { validateAndGetLocalConfig } from '../utils/local-config.js';
  * @returns {Promise<object>} A promise resolving to an object with a content property
  */
 export async function listAppsTool({ appSourcePath }) {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   // Validate local config
   const localConfig = validateAndGetLocalConfig({ appSourcePath });
 
@@ -28,6 +32,17 @@ export async function listAppsTool({ appSourcePath }) {
   const data = await listApps({ 
     orgId: currentOrg.id,
     appSourcePath 
+  });
+
+  // Track successful list apps
+  const duration = Date.now() - startTime;
+  await sendEventToMixpanel({
+    event: 'tool.succeeded',
+    properties: {
+      tool_name: 'listApps',
+      duration_ms: duration,
+    },
+    userId: accountData.id,
   });
 
   return {

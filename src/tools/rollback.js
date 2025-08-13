@@ -1,6 +1,7 @@
 import { rollbackApp, getAccount } from '../sdk.js';
 import { findOrgByName } from '../utils/organization.js';
 import { validateAndGetLocalConfig } from '../utils/local-config.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Rollback tool for rolling back deployment to a previous version via management API.
@@ -26,6 +27,9 @@ export async function rollbackTool({
     };
   }
 
+  // Track start time for analytics
+  const startTime = Date.now();
+
   try {
     // Validate local config
     const localConfig = validateAndGetLocalConfig({ appSourcePath });
@@ -46,6 +50,17 @@ export async function rollbackTool({
       versionId,
       branch: gitBranch,
       appSourcePath,
+    });
+
+    // Track successful rollback
+    const duration = Date.now() - startTime;
+    await sendEventToMixpanel({
+      event: 'tool.succeeded',
+      properties: {
+        tool_name: 'rollback',
+        duration_ms: duration,
+      },
+      userId: accountData.id,
     });
 
     return {

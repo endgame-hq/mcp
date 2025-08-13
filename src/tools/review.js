@@ -6,6 +6,7 @@ import {
 } from '../utils/local-config.js';
 import { findOrgByName } from '../utils/organization.js';
 import { ERRORS } from '../utils/errors.js';
+import { sendEventToMixpanel } from '../utils/mixpanel.js';
 
 /**
  * Get examples for app development based on specified parameters.
@@ -30,6 +31,9 @@ export async function reviewTool({
   packageManager,
   frameworks,
 }) {
+  // Track start time for analytics
+  const startTime = Date.now();
+
   /**
    * Normally, the SDK gets the API key, but this tool does it up front
    * in case the user has not authenticated yet. We can catch it early
@@ -77,6 +81,17 @@ export async function reviewTool({
     language,
     packageManager,
     frameworks,
+  });
+
+  // Track successful review
+  const duration = Date.now() - startTime;
+  await sendEventToMixpanel({
+    event: 'tool.succeeded',
+    properties: {
+      tool_name: 'review',
+      duration_ms: duration,
+    },
+    userId: accountData.id,
   });
 
   return {
